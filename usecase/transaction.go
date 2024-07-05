@@ -39,7 +39,6 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 	)
 
 	// check account linking status
-	// GetAccountByID: if record is not found, return (nil, nil)
 	account, err := uc.repo.GetAccountByID(ctx, accountID)
 	if err != nil {
 		return apperror.ErrGet(err, "Failed to get account by id")
@@ -56,7 +55,6 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 	trans = entity.NewTransaction(transID, "", walletID, accountID, amount, currency, entity.TransactionIn, entity.CategoryDeposit, note)
 
 	// get wallet
-	// func GetWalletByID: if record is not found, return (nil, nil)
 	wallet, err := uc.repo.GetWalletByID(ctx, walletID)
 	if err != nil {
 		return apperror.ErrGet(err, "Failed to get wallet by id")
