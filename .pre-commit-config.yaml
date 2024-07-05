@@ -1,0 +1,13 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: check-branch-name
+        name: check branch name
+        entry: ./tools/pre-commit/check-branch-name.sh
+        language: script
+        stages: [prepare-commit-msg]
+    -   id: check-commit-msg
+        name: check commit msg
+        entry: ./tools/pre-commit/check-commit-msg.sh
+        language: script
+        stages: [prepare-commit-msg]

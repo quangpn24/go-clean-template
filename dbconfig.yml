@@ -1,0 +1,5 @@
+development:
+  dialect: postgresql
+  datasource: root:root@tcp(127.0.0.1:5432)/go-clean?parseTime=true
+  dir: migrations
+  table: gorp_migrations
