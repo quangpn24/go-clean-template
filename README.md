@@ -1,6 +1,40 @@
 # Go clean architecture template
 This is a template for Go project with clean architecture.
-
+## Folder structure
+```
+go-clean-template
+├── cmd
+│   ├── httpserver
+│   └── migrate
+├── entity/domain/model
+├── handler // as controller
+│   └── httpserver
+│       ├── model
+│       ├── options.go
+│       ├── server.go
+│       └── *_handler.go // handle request to client
+├── infras
+│   ├── banksvc // call API to bank service
+│   ├── notification // push noti
+│   └── postgrestore
+│       ├── schema
+│       ├── postgresql.go // contains actions to connect DB
+│       └── *_repo.go // implement repository interfaces
+├── migrations // contains migration files
+├── mocks // contains mock files used for unit testing
+├── pkg // contains common packages
+│   ├── apperror
+│   ├── config
+│   ├── logger
+│   ├── sentry
+│   └── validation
+├── tools
+│   ├── compose
+│   └── pre-commit
+└── usecase
+    ├── interface.go // contains all interfaces
+    └── ... // specific usecases
+```
 ## Development
 
 ### Init local environment

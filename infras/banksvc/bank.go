@@ -1,4 +1,4 @@
-package banksv
+package banksvc
 
 type BankService struct {
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"go-clean-template/handler/httpserver"
-	"go-clean-template/infras/banksv"
+	"go-clean-template/infras/banksvc"
 	"go-clean-template/infras/notification"
 	"go-clean-template/infras/postgrestore"
 	"go-clean-template/pkg/config"
@@ -49,7 +49,7 @@ func main() {
 
 	//Setup Dependencies
 	transRepo := postgrestore.NewTransactionRepo(db)
-	bankSvc := banksv.NewBankService()
+	bankSvc := banksvc.NewBankService()
 	dbTransaction := postgrestore.NewDBTransaction(db)
 	transUseCase := usecase.NewTransactionUseCase(transRepo, bankSvc, dbTransaction)
 	transUseCase.SetNotifiers(notification.NewEmailNotifier(), notification.NewAppNotifier())
