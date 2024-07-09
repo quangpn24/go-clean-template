@@ -2,7 +2,6 @@ package postgrestore
 
 import (
 	"context"
-	"go-clean-template/usecase"
 
 	"gorm.io/gorm"
 )
@@ -15,7 +14,7 @@ func NewDBTransaction(db *gorm.DB) *DBTransaction {
 	return &DBTransaction{db: db}
 }
 
-func (r *DBTransaction) Begin(ctx context.Context) (usecase.IDBTransaction, error) {
+func (r *DBTransaction) Begin(ctx context.Context) (_interface.IDBTransaction, error) {
 	tx := r.db.WithContext(ctx).Begin()
 	return &DBTransaction{db: tx}, tx.Error
 }

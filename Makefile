@@ -11,11 +11,11 @@ db/migrate:
 	go run ./cmd/migrate
 
 mock:
-	@mockery --name ITransactionUseCase --with-expecter --filename mock_transaction_use_case.go --dir usecase --output mocks
-	@mockery --name IBankService --with-expecter --filename mock_bank_service.go --dir usecase --output mocks
-	@mockery --name ITransactionRepository --with-expecter --filename mock_transaction_repo.go --dir usecase --output mocks
-	@mockery --name INotifier --with-expecter --filename mock_notifier.go --dir usecase --output mocks
-	@mockery --name IDBTransaction --with-expecter --filename mock_db_transaction.go --dir usecase --output mocks
+	@mockery --name ITransactionUseCase --with-expecter --filename mock_transaction_use_case.go --dir usecase/interfaces --output usecase/mocks
+	@mockery --name IBankService --with-expecter --filename mock_bank_service.go --dir usecase/interfaces --output usecase/mocks
+	@mockery --name ITransactionRepository --with-expecter --filename mock_transaction_repo.go --dir usecase/interfaces --output usecase/mocks
+	@mockery --name INotifier --with-expecter --filename mock_notifier.go --dir usecase/interfaces --output usecase/mocks
+	@mockery --name IDBTransaction --with-expecter --filename mock_db_transaction.go --dir usecase/interfaces --output usecase/mocks
 
 lint:
 	@(hash golangci-lint 2>/dev/null || \

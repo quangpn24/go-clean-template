@@ -4,7 +4,7 @@ package mocks
 
 import (
 	context "context"
-	usecase "go-clean-template/usecase"
+	interfaces "go-clean-template/usecase/interfaces"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -23,23 +23,23 @@ func (_m *IDBTransaction) EXPECT() *IDBTransaction_Expecter {
 }
 
 // Begin provides a mock function with given fields: ctx
-func (_m *IDBTransaction) Begin(ctx context.Context) (usecase.IDBTransaction, error) {
+func (_m *IDBTransaction) Begin(ctx context.Context) (interfaces.IDBTransaction, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Begin")
 	}
 
-	var r0 usecase.IDBTransaction
+	var r0 interfaces.IDBTransaction
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (usecase.IDBTransaction, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (interfaces.IDBTransaction, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) usecase.IDBTransaction); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) interfaces.IDBTransaction); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(usecase.IDBTransaction)
+			r0 = ret.Get(0).(interfaces.IDBTransaction)
 		}
 	}
 
@@ -70,12 +70,12 @@ func (_c *IDBTransaction_Begin_Call) Run(run func(ctx context.Context)) *IDBTran
 	return _c
 }
 
-func (_c *IDBTransaction_Begin_Call) Return(_a0 usecase.IDBTransaction, _a1 error) *IDBTransaction_Begin_Call {
+func (_c *IDBTransaction_Begin_Call) Return(_a0 interfaces.IDBTransaction, _a1 error) *IDBTransaction_Begin_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *IDBTransaction_Begin_Call) RunAndReturn(run func(context.Context) (usecase.IDBTransaction, error)) *IDBTransaction_Begin_Call {
+func (_c *IDBTransaction_Begin_Call) RunAndReturn(run func(context.Context) (interfaces.IDBTransaction, error)) *IDBTransaction_Begin_Call {
 	_c.Call.Return(run)
 	return _c
 }

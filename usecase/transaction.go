@@ -5,27 +5,28 @@ import (
 	"fmt"
 	"go-clean-template/entity"
 	"go-clean-template/pkg/apperror"
+	"go-clean-template/usecase/interfaces"
 
 	"github.com/google/uuid"
 )
 
 type TransactionUseCase struct {
-	repo          ITransactionRepository
-	bankSvc       IBankService
-	notifiers     []INotifier
-	dbTransaction IDBTransaction
+	repo          interfaces.ITransactionRepository
+	bankSvc       interfaces.IBankService
+	notifiers     []interfaces.INotifier
+	dbTransaction interfaces.IDBTransaction
 }
 
-func NewTransactionUseCase(repo ITransactionRepository, bankSvc IBankService, dbTransaction IDBTransaction) *TransactionUseCase {
+func NewTransactionUseCase(repo interfaces.ITransactionRepository, bankSvc interfaces.IBankService, dbTransaction interfaces.IDBTransaction) *TransactionUseCase {
 	return &TransactionUseCase{
 		repo:          repo,
 		bankSvc:       bankSvc,
-		notifiers:     []INotifier{},
+		notifiers:     []interfaces.INotifier{},
 		dbTransaction: dbTransaction,
 	}
 }
 
-func (uc *TransactionUseCase) SetNotifiers(notifiers ...INotifier) func(*TransactionUseCase) {
+func (uc *TransactionUseCase) SetNotifiers(notifiers ...interfaces.INotifier) func(*TransactionUseCase) {
 	return func(uc *TransactionUseCase) {
 		uc.notifiers = append(uc.notifiers, notifiers...)
 	}

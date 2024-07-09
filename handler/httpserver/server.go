@@ -5,7 +5,6 @@ import (
 	"go-clean-template/pkg/config"
 	"go-clean-template/pkg/logger"
 	"go-clean-template/pkg/sentry"
-	"go-clean-template/usecase"
 	"net/http"
 	"strings"
 
@@ -20,7 +19,7 @@ type Server struct {
 	Config *config.Config
 	Logger *zap.SugaredLogger
 
-	TransactionUseCase usecase.ITransactionUseCase
+	TransactionUseCase _interface.ITransactionUseCase
 }
 
 func New(options ...Options) (*Server, error) {
