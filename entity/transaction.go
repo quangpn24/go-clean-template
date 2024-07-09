@@ -1,12 +1,5 @@
 package entity
 
-type TransactionKind string
-
-const (
-	TransactionIn  TransactionKind = "in"
-	TransactionOut TransactionKind = "out"
-)
-
 type TransactionCategory string
 
 const (
@@ -22,11 +15,10 @@ type Transaction struct {
 	Amount           float64
 	Currency         string
 	Category         TransactionCategory
-	TransactionKind  TransactionKind
 	Note             string
 }
 
-func NewTransaction(id string, sender string, receiver string, accountID string, amount float64, currency string, kind TransactionKind, category TransactionCategory, note string) *Transaction {
+func NewTransaction(id string, sender string, receiver string, accountID string, amount float64, currency string, category TransactionCategory, note string) *Transaction {
 	return &Transaction{
 		ID:               id,
 		SenderWalletID:   sender,
@@ -35,7 +27,6 @@ func NewTransaction(id string, sender string, receiver string, accountID string,
 		Amount:           amount,
 		Currency:         currency,
 		Category:         category,
-		TransactionKind:  kind,
 		Note:             note,
 	}
 }

@@ -52,7 +52,7 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 	}
 
 	// create new transaction
-	trans = entity.NewTransaction(transID, "", walletID, accountID, amount, currency, entity.TransactionIn, entity.CategoryDeposit, note)
+	trans = entity.NewTransaction(transID, "", walletID, accountID, amount, currency, entity.CategoryDeposit, note)
 
 	// get wallet
 	wallet, err := uc.repo.GetWalletByID(ctx, walletID)

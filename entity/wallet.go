@@ -22,7 +22,7 @@ func NewWallet(id string, userID string, balance float64, currency string) (*Wal
 }
 
 func (w *Wallet) Deposit(amount float64) error {
-	if amount < 0 {
+	if amount <= 0 {
 		return fmt.Errorf("amount must be greater than 0")
 	}
 	w.Balance += amount
@@ -30,7 +30,7 @@ func (w *Wallet) Deposit(amount float64) error {
 }
 
 func (w *Wallet) Withdraw(amount float64) error {
-	if amount < 0 {
+	if amount <= 0 {
 		return fmt.Errorf("amount must be greater than 0")
 	}
 
