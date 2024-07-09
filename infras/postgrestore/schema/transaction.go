@@ -50,7 +50,6 @@ func ToTransactionSchema(trans *entity.Transaction) *TransactionSchema {
 		Amount:           trans.Amount,
 		Currency:         trans.Currency,
 		Category:         string(trans.Category),
-		TransactionKind:  string(trans.TransactionKind),
 		Note:             trans.Note,
 	}
 }
@@ -82,7 +81,6 @@ func (trans *TransactionSchema) ToTransaction() *entity.Transaction {
 		Amount:           trans.Amount,
 		Currency:         trans.Currency,
 		Category:         entity.TransactionCategory(trans.Category),
-		TransactionKind:  entity.TransactionKind(trans.TransactionKind),
 		Note:             trans.Note,
 	}
 }

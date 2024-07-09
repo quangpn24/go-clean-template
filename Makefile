@@ -1,4 +1,4 @@
-.PHONY: run local-db db/migrate mock lint test
+.PHONY: run local-db db/migrate mock lint test testsum
 
 run:
 	air -c .air.toml
@@ -27,3 +27,8 @@ test:
 	go clean -testcache
 	go test -cover ./... -gcflags=all=-l -coverprofile  cover.out
 	go tool cover -html=cover.out
+
+testsum:
+	# go install gotest.tools/gotestsum@latest
+	go clean -testcache
+	gotestsum --format testname

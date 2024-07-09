@@ -26,10 +26,8 @@ func NewTransactionUseCase(repo interfaces.ITransactionRepository, bankSvc inter
 	}
 }
 
-func (uc *TransactionUseCase) SetNotifiers(notifiers ...interfaces.INotifier) func(*TransactionUseCase) {
-	return func(uc *TransactionUseCase) {
-		uc.notifiers = append(uc.notifiers, notifiers...)
-	}
+func (uc *TransactionUseCase) SetNotifiers(notifiers ...interfaces.INotifier) {
+	uc.notifiers = append(uc.notifiers, notifiers...)
 }
 
 func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, accountID string, amount float64, currency string, note string) error {
@@ -42,7 +40,7 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 	// check account linking status
 	account, err := uc.repo.GetAccountByID(ctx, accountID)
 	if err != nil {
-		return apperror.ErrGet(err, "Failed to get account by id")
+		return apperror.ErrGet(err, "failed to get account by id")
 	}
 	if account == nil {
 		return apperror.ErrInvalidParams(fmt.Errorf("account not found"))
@@ -58,7 +56,7 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 	// get wallet
 	wallet, err := uc.repo.GetWalletByID(ctx, walletID)
 	if err != nil {
-		return apperror.ErrGet(err, "Failed to get wallet by id")
+		return apperror.ErrGet(err, "failed to get wallet by id")
 	}
 
 	if wallet == nil {
@@ -73,7 +71,7 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 	// start transaction
 	tx, err := uc.dbTransaction.Begin(ctx)
 	if err != nil {
-		return apperror.ErrOtherInternalServerError(err, "Error when starting transaction")
+		return apperror.ErrOtherInternalServerError(err, "error when starting transaction")
 	}
 
 	repo := uc.repo.WithDBTransaction(tx)
@@ -81,24 +79,24 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 	// update wallet
 	if err := repo.UpdateWalletBalance(ctx, walletID, wallet.Balance); err != nil {
 		tx.Rollback(ctx)
-		return apperror.ErrUpdate(err, "Failed to update balance")
+		return apperror.ErrUpdate(err, "failed to update balance")
 	}
 
 	// save transaction
 	if err := repo.SaveTransaction(ctx, trans); err != nil {
 		tx.Rollback(ctx)
-		return apperror.ErrCreate(err, "Failed to create deposit transaction")
+		return apperror.ErrCreate(err, "failed to create deposit transaction")
 	}
 
 	// call bank service
 	if err := uc.bankSvc.Deposit(account.AccountNumber, account.BankName, amount, currency, note); err != nil {
 		tx.Rollback(ctx)
-		return apperror.ErrThirdParty(err, "Error when calling api deposit bank service")
+		return apperror.ErrThirdParty(err, "error when calling api deposit bank service")
 	}
 
 	// Commit and finish transaction
 	if err := tx.Commit(ctx); err != nil {
-		return apperror.ErrOtherInternalServerError(err, "Error when committing transaction")
+		return apperror.ErrOtherInternalServerError(err, "error when committing transaction")
 	}
 
 	// notification, don't care result

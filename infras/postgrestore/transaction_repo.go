@@ -4,6 +4,7 @@ import (
 	"context"
 	"go-clean-template/entity"
 	"go-clean-template/infras/postgrestore/schema"
+	"go-clean-template/usecase/interfaces"
 
 	"gorm.io/gorm"
 )
@@ -22,7 +23,7 @@ func NewTransactionRepo(db *gorm.DB) *TransactionRepo {
 	return &TransactionRepo{db: db}
 }
 
-func (r *TransactionRepo) WithDBTransaction(tx _interface.IDBTransaction) _interface.ITransactionRepository {
+func (r *TransactionRepo) WithDBTransaction(tx interfaces.IDBTransaction) interfaces.ITransactionRepository {
 	trans, ok := tx.(*DBTransaction)
 	if !ok {
 		return r
