@@ -1,8 +1,9 @@
 package schema
 
 import (
-	"go-clean-template/entity"
 	"time"
+
+	"go-clean-template/entity"
 )
 
 type TransactionSchema struct {
@@ -13,7 +14,6 @@ type TransactionSchema struct {
 	Amount           float64
 	Currency         string
 	Category         string
-	TransactionKind  string
 	Note             string
 	CreatedAt        time.Time `gorm:"column:created_at;<-:create"`
 	UpdatedAt        time.Time `gorm:"column:updated_at"`

@@ -5,6 +5,7 @@ type TransactionCategory string
 const (
 	CategoryDeposit  TransactionCategory = "DEPOSIT"
 	CategoryWithdraw TransactionCategory = "WITHDRAW"
+	CategoryTransfer TransactionCategory = "TRANSFER"
 )
 
 type Transaction struct {
