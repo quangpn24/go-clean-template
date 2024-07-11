@@ -2,6 +2,7 @@ package postgrestore
 
 import (
 	"context"
+
 	"go-clean-template/entity"
 	"go-clean-template/infras/postgrestore/schema"
 	"go-clean-template/usecase/interfaces"
@@ -50,19 +51,13 @@ func (r *TransactionRepo) GetWalletByID(ctx context.Context, walletID string) (*
 }
 
 func (r *TransactionRepo) UpdateWalletBalance(ctx context.Context, walletID string, balance float64) error {
-	if err := r.db.WithContext(ctx).Table(WalletTable).Where("id = ?", walletID).
-		Update("balance", balance).Error; err != nil {
-		return err
-	}
-	return nil
+	return r.db.WithContext(ctx).Table(WalletTable).Where("id = ?", walletID).
+		Update("balance", balance).Error
 }
 
 func (r *TransactionRepo) SaveTransaction(ctx context.Context, trans *entity.Transaction) error {
 	transSchema := schema.ToTransactionSchema(trans)
-	if err := r.db.WithContext(ctx).Table(TransactionsTable).Create(transSchema).Error; err != nil {
-		return err
-	}
-	return nil
+	return r.db.WithContext(ctx).Table(TransactionsTable).Create(transSchema).Error
 }
 
 func (r *TransactionRepo) GetAccountByID(ctx context.Context, accountID string) (*entity.Account, error) {

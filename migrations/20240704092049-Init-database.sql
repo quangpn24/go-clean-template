@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS transactions (
     amount decimal(10, 2) NOT NULL,
     currency varchar(10) NOT NULL DEFAULT 'VND',
     category varchar(100) NOT NULL,
-    transaction_kind varchar(100) NOT NULL,
     note text,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP

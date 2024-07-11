@@ -1,13 +1,14 @@
 package httpserver
 
 import (
+	"net/http"
+	"strings"
+
 	apperror "go-clean-template/pkg/apperror"
 	"go-clean-template/pkg/config"
 	"go-clean-template/pkg/logger"
 	"go-clean-template/pkg/sentry"
 	"go-clean-template/usecase/interfaces"
-	"net/http"
-	"strings"
 
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
@@ -67,6 +68,7 @@ func (s *Server) RegisterGlobalMiddlewares() {
 func (s *Server) Start(addr string) error {
 	return s.Router.Start(addr)
 }
+
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.Router.ServeHTTP(w, r)
 }
