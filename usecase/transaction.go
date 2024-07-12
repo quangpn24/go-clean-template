@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+
 	"go-clean-template/entity"
 	"go-clean-template/pkg/apperror"
 	"go-clean-template/usecase/interfaces"
@@ -12,15 +13,15 @@ import (
 
 type TransactionUseCase struct {
 	repo          interfaces.ITransactionRepository
-	bankSvc       interfaces.IBankService
+	paymentSvc    interfaces.IPaymentServiceProvider
 	notifiers     []interfaces.INotifier
 	dbTransaction interfaces.IDBTransaction
 }
 
-func NewTransactionUseCase(repo interfaces.ITransactionRepository, bankSvc interfaces.IBankService, dbTransaction interfaces.IDBTransaction) *TransactionUseCase {
+func NewTransactionUseCase(repo interfaces.ITransactionRepository, paymentSvc interfaces.IPaymentServiceProvider, dbTransaction interfaces.IDBTransaction) *TransactionUseCase {
 	return &TransactionUseCase{
 		repo:          repo,
-		bankSvc:       bankSvc,
+		paymentSvc:    paymentSvc,
 		notifiers:     []interfaces.INotifier{},
 		dbTransaction: dbTransaction,
 	}
@@ -89,9 +90,9 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 	}
 
 	// call bank service
-	if err := uc.bankSvc.Deposit(account.AccountNumber, account.BankName, amount, currency, note); err != nil {
+	if err := uc.paymentSvc.Deposit(account.AccountNumber, account.BankName, amount, currency, note); err != nil {
 		tx.Rollback(ctx)
-		return apperror.ErrThirdParty(err, "error when calling api deposit bank service")
+		return apperror.ErrThirdParty(err, "error when calling api deposit payment service")
 	}
 
 	// Commit and finish transaction

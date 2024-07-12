@@ -3,12 +3,13 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"reflect"
+	"testing"
+
 	"go-clean-template/entity"
 	"go-clean-template/pkg/apperror"
 	"go-clean-template/usecase/interfaces"
 	"go-clean-template/usecase/mocks"
-	"reflect"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -17,7 +18,7 @@ import (
 func TestNewTransactionUseCase(t *testing.T) {
 	type args struct {
 		repo          interfaces.ITransactionRepository
-		bankSvc       interfaces.IBankService
+		paymentSvc    interfaces.IPaymentServiceProvider
 		dbTransaction interfaces.IDBTransaction
 	}
 	tests := []struct {
@@ -29,12 +30,12 @@ func TestNewTransactionUseCase(t *testing.T) {
 			name: "create new transaction use case",
 			args: args{
 				repo:          mocks.NewITransactionRepository(t),
-				bankSvc:       mocks.NewIBankService(t),
+				paymentSvc:    mocks.NewIPaymentServiceProvider(t),
 				dbTransaction: mocks.NewIDBTransaction(t),
 			},
 			want: &TransactionUseCase{
 				repo:          mocks.NewITransactionRepository(t),
-				bankSvc:       mocks.NewIBankService(t),
+				paymentSvc:    mocks.NewIPaymentServiceProvider(t),
 				notifiers:     []interfaces.INotifier{},
 				dbTransaction: mocks.NewIDBTransaction(t),
 			},
@@ -42,7 +43,7 @@ func TestNewTransactionUseCase(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewTransactionUseCase(tt.args.repo, tt.args.bankSvc, tt.args.dbTransaction); !reflect.DeepEqual(got, tt.want) {
+			if got := NewTransactionUseCase(tt.args.repo, tt.args.paymentSvc, tt.args.dbTransaction); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewTransactionUseCase() = %v, want %v", got, tt.want)
 			}
 		})
@@ -76,12 +77,12 @@ func TestTransactionUseCase_SetNotifiers(t *testing.T) {
 
 func TestTransactionUseCase_Deposit(t *testing.T) {
 	transRepo := mocks.NewITransactionRepository(t)
-	bankSvc := mocks.NewIBankService(t)
+	paymentSvc := mocks.NewIPaymentServiceProvider(t)
 	dbTrans := mocks.NewIDBTransaction(t)
 	notifier := mocks.NewINotifier(t)
 	uc := TransactionUseCase{
 		repo:          transRepo,
-		bankSvc:       bankSvc,
+		paymentSvc:    paymentSvc,
 		notifiers:     []interfaces.INotifier{notifier},
 		dbTransaction: dbTrans,
 	}
@@ -130,7 +131,7 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 
 		dbTrans.EXPECT().Commit(ctx).Return(nil).Once()
 
-		bankSvc.EXPECT().Deposit(accountMock.AccountNumber, accountMock.BankName, amount, currency, note).Return(nil).Once()
+		paymentSvc.EXPECT().Deposit(accountMock.AccountNumber, accountMock.BankName, amount, currency, note).Return(nil).Once()
 
 		notifier.EXPECT().SendNotification(ctx, "Deposit success").Return().Once()
 
@@ -441,7 +442,7 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 		assert.Equal(t, expectedErr, err)
 	})
 
-	t.Run("failed to call bank service", func(t *testing.T) {
+	t.Run("failed to call payment service", func(t *testing.T) {
 		//Arrange
 		ctx := context.Background()
 		walletID := "w_00001"
@@ -449,7 +450,7 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 		amount := 1000000.0
 		currency := "VND"
 		note := "Deposit 1,000,000 VND"
-		errBankSvc := fmt.Errorf("unexpected error")
+		errPaymentSvc := fmt.Errorf("unexpected error")
 
 		accountMock := &entity.Account{
 			ID:            accountID,
@@ -485,14 +486,14 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 		dbTrans.EXPECT().Begin(ctx).Return(dbTrans, nil).Once()
 		dbTrans.EXPECT().Rollback(ctx).Return().Once()
 
-		bankSvc.EXPECT().Deposit(accountMock.AccountNumber, accountMock.BankName, amount, currency, note).Return(errBankSvc).Once()
+		paymentSvc.EXPECT().Deposit(accountMock.AccountNumber, accountMock.BankName, amount, currency, note).Return(errPaymentSvc).Once()
 
 		//Act
 		err := uc.Deposit(ctx, walletID, accountID, amount, currency, note)
 
 		//Assert
 		assert.Error(t, err)
-		expectedErr := apperror.ErrThirdParty(errBankSvc, "error when calling api deposit bank service")
+		expectedErr := apperror.ErrThirdParty(errPaymentSvc, "error when calling api deposit payment service")
 		assert.Equal(t, expectedErr, err)
 	})
 
@@ -540,7 +541,7 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 		dbTrans.EXPECT().Begin(ctx).Return(dbTrans, nil).Once()
 		dbTrans.EXPECT().Commit(ctx).Return(errCommitTrans).Once()
 
-		bankSvc.EXPECT().Deposit(accountMock.AccountNumber, accountMock.BankName, amount, currency, note).Return(nil).Once()
+		paymentSvc.EXPECT().Deposit(accountMock.AccountNumber, accountMock.BankName, amount, currency, note).Return(nil).Once()
 
 		//Act
 		err := uc.Deposit(ctx, walletID, accountID, amount, currency, note)

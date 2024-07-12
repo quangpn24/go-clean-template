@@ -14,7 +14,7 @@ go-clean-template
 │       ├── server.go
 │       └── *_handler.go // handle request to client
 ├── infras
-│   ├── banksvc // call API to bank service
+│   ├── paymentsvc // call API to payment service provider
 │   ├── notification // push noti
 │   └── postgrestore
 │       ├── schema

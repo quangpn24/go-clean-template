@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"go-clean-template/handler/httpserver"
-	"go-clean-template/infras/banksvc"
 	"go-clean-template/infras/notification"
+	"go-clean-template/infras/paymentsvc"
 	"go-clean-template/infras/postgrestore"
 	"go-clean-template/pkg/config"
 	"go-clean-template/pkg/logger"
 	"go-clean-template/pkg/sentry"
 	"go-clean-template/usecase"
-	"log"
 
 	sentrygo "github.com/getsentry/sentry-go"
 )
@@ -49,9 +50,9 @@ func main() {
 
 	//Setup Dependencies
 	transRepo := postgrestore.NewTransactionRepo(db)
-	bankSvc := banksvc.NewBankService()
+	paymentSvc := paymentsvc.NewPaymentServiceProvider()
 	dbTransaction := postgrestore.NewDBTransaction(db)
-	transUseCase := usecase.NewTransactionUseCase(transRepo, bankSvc, dbTransaction)
+	transUseCase := usecase.NewTransactionUseCase(transRepo, paymentSvc, dbTransaction)
 	transUseCase.SetNotifiers(notification.NewEmailNotifier(), notification.NewAppNotifier())
 
 	server.TransactionUseCase = transUseCase

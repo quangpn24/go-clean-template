@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+
 	"go-clean-template/entity"
 )
 
@@ -10,7 +11,7 @@ type ITransactionUseCase interface {
 	//Withdraw(ctx context.Context) apperror
 }
 
-type IBankService interface {
+type IPaymentServiceProvider interface {
 	Deposit(accountNumber string, bankName string, amount float64, currency string, note string) error
 }
 

@@ -69,7 +69,7 @@ func TestTransactionRepo_GetWalletByID(t *testing.T) {
 
 	t.Run("record not found", func(t *testing.T) {
 		//Act
-		got, err := repo.GetWalletByID(ctx, "w_0001")
+		got, err := repo.GetWalletByID(ctx, "w_0002")
 
 		//Assert
 		assert.NoError(t, err)
@@ -193,7 +193,7 @@ func TestTransactionRepo_GetAccountByID(t *testing.T) {
 
 	t.Run("record not found", func(t *testing.T) {
 		//Act
-		got, err := repo.GetAccountByID(ctx, "acc_0001")
+		got, err := repo.GetAccountByID(ctx, "acc_0002")
 
 		//Assert
 		assert.NoError(t, err)
