@@ -8,11 +8,12 @@ import (
 
 type ITransactionUseCase interface {
 	Deposit(ctx context.Context, walletID string, accountID string, amount float64, currency string, note string) error
-	//Withdraw(ctx context.Context) apperror
+	Withdraw(ctx context.Context, walletID string, accountID string, amount float64, currency string, note string) error
 }
 
 type IPaymentServiceProvider interface {
 	Deposit(accountNumber string, bankName string, amount float64, currency string, note string) error
+	Withdraw(accountNumber string, bankName string, amount float64, currency string, note string) error
 }
 
 type ITransactionRepository interface {

@@ -17,3 +17,17 @@ func (r DepositRequest) Validate() error {
 	err := v.Struct(r)
 	return err
 }
+
+type WithdrawRequest struct {
+	WalletID  string  `json:"wallet_id"`
+	AccountID string  `json:"account_id"`
+	Amount    float64 `json:"amount" validate:"required,gt=0"`
+	Currency  string  `json:"currency"`
+	Note      string  `json:"note"`
+}
+
+func (r WithdrawRequest) Validate() error {
+	v := validator.New()
+	err := v.Struct(r)
+	return err
+}
