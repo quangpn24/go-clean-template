@@ -32,7 +32,8 @@ go-clean-template
 │   ├── compose
 │   └── pre-commit
 └── usecase
-    ├── interface.go // contains all interfaces
+    ├── interfaces
+    │   └── interface.go
     └── ... // specific usecases
 ```
 ## Development
@@ -70,10 +71,10 @@ make lint
 ### Create new migration file
 
 ```shell
-sql-migrate new -env="development" create-users-table
+sql-migrate new -env="development" Init-database
 ```
 
-- Result: `Created migration migrations/20230908204301-create-user-table.sql`
+- Result: `Created migration migrations/20240704092049-Init-database.sql`
 
 Then run migration:
 ```shell
