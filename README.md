@@ -7,24 +7,25 @@ go-clean-template
 │   ├── httpserver
 │   └── migrate
 ├── entity/domain/model
-├── handler // as controller
+├── handler //as controller
 │   └── httpserver
+│       ├── middleware
 │       ├── model
 │       ├── options.go
 │       ├── server.go
-│       └── *_handler.go // handle request to client
+│       └── *_handler.go //handle request to client
 ├── infras
-│   ├── paymentsvc // call API to payment service provider
-│   ├── notification // push noti
+│   ├── paymentsvc //call API to payment service provider
+│   ├── notification //push noti
 │   └── postgrestore
 │       ├── schema
-│       ├── postgresql.go // contains actions to connect DB
-│       └── *_repo.go // implement repository interfaces
-├── migrations // contains migration files
-├── mocks // contains mock files used for unit testing
+│       ├── postgresql.go //contains actions to connect DB
+│       └── *_repo.go //implement repository interfaces
+├── migrations  //contains migration files
 ├── pkg // contains common packages
 │   ├── apperror
 │   ├── config
+│   ├── constant
 │   ├── logger
 │   ├── sentry
 │   └── validation
@@ -32,10 +33,11 @@ go-clean-template
 │   ├── compose
 │   └── pre-commit
 └── usecase
-    ├── interfaces
-    │   └── interface.go
-    └── ... // specific usecases
+    ├── mocks //contains mock files used for unit testing
+    ├── interface.go //contains all interfaces
+    └── ... //specific usecases
 ```
+
 ## Development
 
 ### Init local environment
