@@ -5,7 +5,6 @@ package mocks
 import (
 	context "context"
 	entity "go-clean-template/entity"
-	interfaces "go-clean-template/usecase/interfaces"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -23,24 +22,81 @@ func (_m *ITransactionRepository) EXPECT() *ITransactionRepository_Expecter {
 	return &ITransactionRepository_Expecter{mock: &_m.Mock}
 }
 
-// GetAccountByID provides a mock function with given fields: ctx, accountID
-func (_m *ITransactionRepository) GetAccountByID(ctx context.Context, accountID string) (*entity.Account, error) {
+// GetBalanceByWalletID provides a mock function with given fields: ctx, walletID
+func (_m *ITransactionRepository) GetBalanceByWalletID(ctx context.Context, walletID string) (float64, error) {
+	ret := _m.Called(ctx, walletID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBalanceByWalletID")
+	}
+
+	var r0 float64
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (float64, error)); ok {
+		return rf(ctx, walletID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) float64); ok {
+		r0 = rf(ctx, walletID)
+	} else {
+		r0 = ret.Get(0).(float64)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, walletID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ITransactionRepository_GetBalanceByWalletID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBalanceByWalletID'
+type ITransactionRepository_GetBalanceByWalletID_Call struct {
+	*mock.Call
+}
+
+// GetBalanceByWalletID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - walletID string
+func (_e *ITransactionRepository_Expecter) GetBalanceByWalletID(ctx interface{}, walletID interface{}) *ITransactionRepository_GetBalanceByWalletID_Call {
+	return &ITransactionRepository_GetBalanceByWalletID_Call{Call: _e.mock.On("GetBalanceByWalletID", ctx, walletID)}
+}
+
+func (_c *ITransactionRepository_GetBalanceByWalletID_Call) Run(run func(ctx context.Context, walletID string)) *ITransactionRepository_GetBalanceByWalletID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *ITransactionRepository_GetBalanceByWalletID_Call) Return(_a0 float64, _a1 error) *ITransactionRepository_GetBalanceByWalletID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ITransactionRepository_GetBalanceByWalletID_Call) RunAndReturn(run func(context.Context, string) (float64, error)) *ITransactionRepository_GetBalanceByWalletID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetLinkedAccountByID provides a mock function with given fields: ctx, accountID
+func (_m *ITransactionRepository) GetLinkedAccountByID(ctx context.Context, accountID string) (*entity.LinkedAccount, error) {
 	ret := _m.Called(ctx, accountID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetAccountByID")
+		panic("no return value specified for GetLinkedAccountByID")
 	}
 
-	var r0 *entity.Account
+	var r0 *entity.LinkedAccount
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*entity.Account, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*entity.LinkedAccount, error)); ok {
 		return rf(ctx, accountID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.Account); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.LinkedAccount); ok {
 		r0 = rf(ctx, accountID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entity.Account)
+			r0 = ret.Get(0).(*entity.LinkedAccount)
 		}
 	}
 
@@ -53,31 +109,90 @@ func (_m *ITransactionRepository) GetAccountByID(ctx context.Context, accountID 
 	return r0, r1
 }
 
-// ITransactionRepository_GetAccountByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAccountByID'
-type ITransactionRepository_GetAccountByID_Call struct {
+// ITransactionRepository_GetLinkedAccountByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLinkedAccountByID'
+type ITransactionRepository_GetLinkedAccountByID_Call struct {
 	*mock.Call
 }
 
-// GetAccountByID is a helper method to define mock.On call
+// GetLinkedAccountByID is a helper method to define mock.On call
 //   - ctx context.Context
 //   - accountID string
-func (_e *ITransactionRepository_Expecter) GetAccountByID(ctx interface{}, accountID interface{}) *ITransactionRepository_GetAccountByID_Call {
-	return &ITransactionRepository_GetAccountByID_Call{Call: _e.mock.On("GetAccountByID", ctx, accountID)}
+func (_e *ITransactionRepository_Expecter) GetLinkedAccountByID(ctx interface{}, accountID interface{}) *ITransactionRepository_GetLinkedAccountByID_Call {
+	return &ITransactionRepository_GetLinkedAccountByID_Call{Call: _e.mock.On("GetLinkedAccountByID", ctx, accountID)}
 }
 
-func (_c *ITransactionRepository_GetAccountByID_Call) Run(run func(ctx context.Context, accountID string)) *ITransactionRepository_GetAccountByID_Call {
+func (_c *ITransactionRepository_GetLinkedAccountByID_Call) Run(run func(ctx context.Context, accountID string)) *ITransactionRepository_GetLinkedAccountByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string))
 	})
 	return _c
 }
 
-func (_c *ITransactionRepository_GetAccountByID_Call) Return(_a0 *entity.Account, _a1 error) *ITransactionRepository_GetAccountByID_Call {
+func (_c *ITransactionRepository_GetLinkedAccountByID_Call) Return(_a0 *entity.LinkedAccount, _a1 error) *ITransactionRepository_GetLinkedAccountByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ITransactionRepository_GetAccountByID_Call) RunAndReturn(run func(context.Context, string) (*entity.Account, error)) *ITransactionRepository_GetAccountByID_Call {
+func (_c *ITransactionRepository_GetLinkedAccountByID_Call) RunAndReturn(run func(context.Context, string) (*entity.LinkedAccount, error)) *ITransactionRepository_GetLinkedAccountByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetTransactionByID provides a mock function with given fields: ctx, transID
+func (_m *ITransactionRepository) GetTransactionByID(ctx context.Context, transID string) (*entity.Transaction, error) {
+	ret := _m.Called(ctx, transID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTransactionByID")
+	}
+
+	var r0 *entity.Transaction
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*entity.Transaction, error)); ok {
+		return rf(ctx, transID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.Transaction); ok {
+		r0 = rf(ctx, transID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entity.Transaction)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, transID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ITransactionRepository_GetTransactionByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTransactionByID'
+type ITransactionRepository_GetTransactionByID_Call struct {
+	*mock.Call
+}
+
+// GetTransactionByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - transID string
+func (_e *ITransactionRepository_Expecter) GetTransactionByID(ctx interface{}, transID interface{}) *ITransactionRepository_GetTransactionByID_Call {
+	return &ITransactionRepository_GetTransactionByID_Call{Call: _e.mock.On("GetTransactionByID", ctx, transID)}
+}
+
+func (_c *ITransactionRepository_GetTransactionByID_Call) Run(run func(ctx context.Context, transID string)) *ITransactionRepository_GetTransactionByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *ITransactionRepository_GetTransactionByID_Call) Return(_a0 *entity.Transaction, _a1 error) *ITransactionRepository_GetTransactionByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ITransactionRepository_GetTransactionByID_Call) RunAndReturn(run func(context.Context, string) (*entity.Transaction, error)) *ITransactionRepository_GetTransactionByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -188,17 +303,17 @@ func (_c *ITransactionRepository_SaveTransaction_Call) RunAndReturn(run func(con
 	return _c
 }
 
-// UpdateWalletBalance provides a mock function with given fields: ctx, walletID, balance
-func (_m *ITransactionRepository) UpdateWalletBalance(ctx context.Context, walletID string, balance float64) error {
-	ret := _m.Called(ctx, walletID, balance)
+// UpdateTransactionStatus provides a mock function with given fields: ctx, transID, status
+func (_m *ITransactionRepository) UpdateTransactionStatus(ctx context.Context, transID string, status entity.TransactionStatus) error {
+	ret := _m.Called(ctx, transID, status)
 
 	if len(ret) == 0 {
-		panic("no return value specified for UpdateWalletBalance")
+		panic("no return value specified for UpdateTransactionStatus")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, float64) error); ok {
-		r0 = rf(ctx, walletID, balance)
+	if rf, ok := ret.Get(0).(func(context.Context, string, entity.TransactionStatus) error); ok {
+		r0 = rf(ctx, transID, status)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -206,80 +321,32 @@ func (_m *ITransactionRepository) UpdateWalletBalance(ctx context.Context, walle
 	return r0
 }
 
-// ITransactionRepository_UpdateWalletBalance_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateWalletBalance'
-type ITransactionRepository_UpdateWalletBalance_Call struct {
+// ITransactionRepository_UpdateTransactionStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateTransactionStatus'
+type ITransactionRepository_UpdateTransactionStatus_Call struct {
 	*mock.Call
 }
 
-// UpdateWalletBalance is a helper method to define mock.On call
+// UpdateTransactionStatus is a helper method to define mock.On call
 //   - ctx context.Context
-//   - walletID string
-//   - balance float64
-func (_e *ITransactionRepository_Expecter) UpdateWalletBalance(ctx interface{}, walletID interface{}, balance interface{}) *ITransactionRepository_UpdateWalletBalance_Call {
-	return &ITransactionRepository_UpdateWalletBalance_Call{Call: _e.mock.On("UpdateWalletBalance", ctx, walletID, balance)}
+//   - transID string
+//   - status entity.TransactionStatus
+func (_e *ITransactionRepository_Expecter) UpdateTransactionStatus(ctx interface{}, transID interface{}, status interface{}) *ITransactionRepository_UpdateTransactionStatus_Call {
+	return &ITransactionRepository_UpdateTransactionStatus_Call{Call: _e.mock.On("UpdateTransactionStatus", ctx, transID, status)}
 }
 
-func (_c *ITransactionRepository_UpdateWalletBalance_Call) Run(run func(ctx context.Context, walletID string, balance float64)) *ITransactionRepository_UpdateWalletBalance_Call {
+func (_c *ITransactionRepository_UpdateTransactionStatus_Call) Run(run func(ctx context.Context, transID string, status entity.TransactionStatus)) *ITransactionRepository_UpdateTransactionStatus_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(float64))
+		run(args[0].(context.Context), args[1].(string), args[2].(entity.TransactionStatus))
 	})
 	return _c
 }
 
-func (_c *ITransactionRepository_UpdateWalletBalance_Call) Return(_a0 error) *ITransactionRepository_UpdateWalletBalance_Call {
+func (_c *ITransactionRepository_UpdateTransactionStatus_Call) Return(_a0 error) *ITransactionRepository_UpdateTransactionStatus_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *ITransactionRepository_UpdateWalletBalance_Call) RunAndReturn(run func(context.Context, string, float64) error) *ITransactionRepository_UpdateWalletBalance_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// WithDBTransaction provides a mock function with given fields: tx
-func (_m *ITransactionRepository) WithDBTransaction(tx interfaces.IDBTransaction) interfaces.ITransactionRepository {
-	ret := _m.Called(tx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for WithDBTransaction")
-	}
-
-	var r0 interfaces.ITransactionRepository
-	if rf, ok := ret.Get(0).(func(interfaces.IDBTransaction) interfaces.ITransactionRepository); ok {
-		r0 = rf(tx)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(interfaces.ITransactionRepository)
-		}
-	}
-
-	return r0
-}
-
-// ITransactionRepository_WithDBTransaction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WithDBTransaction'
-type ITransactionRepository_WithDBTransaction_Call struct {
-	*mock.Call
-}
-
-// WithDBTransaction is a helper method to define mock.On call
-//   - tx interfaces.IDBTransaction
-func (_e *ITransactionRepository_Expecter) WithDBTransaction(tx interface{}) *ITransactionRepository_WithDBTransaction_Call {
-	return &ITransactionRepository_WithDBTransaction_Call{Call: _e.mock.On("WithDBTransaction", tx)}
-}
-
-func (_c *ITransactionRepository_WithDBTransaction_Call) Run(run func(tx interfaces.IDBTransaction)) *ITransactionRepository_WithDBTransaction_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(interfaces.IDBTransaction))
-	})
-	return _c
-}
-
-func (_c *ITransactionRepository_WithDBTransaction_Call) Return(_a0 interfaces.ITransactionRepository) *ITransactionRepository_WithDBTransaction_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *ITransactionRepository_WithDBTransaction_Call) RunAndReturn(run func(interfaces.IDBTransaction) interfaces.ITransactionRepository) *ITransactionRepository_WithDBTransaction_Call {
+func (_c *ITransactionRepository_UpdateTransactionStatus_Call) RunAndReturn(run func(context.Context, string, entity.TransactionStatus) error) *ITransactionRepository_UpdateTransactionStatus_Call {
 	_c.Call.Return(run)
 	return _c
 }

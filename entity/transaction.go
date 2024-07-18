@@ -1,33 +1,58 @@
 package entity
 
-type TransactionCategory string
+import "fmt"
+
+type TransactionKind string
 
 const (
-	CategoryDeposit  TransactionCategory = "DEPOSIT"
-	CategoryWithdraw TransactionCategory = "WITHDRAW"
-	CategoryTransfer TransactionCategory = "TRANSFER"
+	TransactionOut TransactionKind = "OUT"
+	TransactionIn  TransactionKind = "IN"
+)
+
+type TransactionStatus string
+
+const (
+	TransactionStatusNew        TransactionStatus = "NEW"
+	TransactionStatusSuccessful TransactionStatus = "SUCCESSFUL"
+	TransactionStatusFailed     TransactionStatus = "FAILED"
 )
 
 type Transaction struct {
-	ID               string
-	SenderWalletID   string
-	ReceiverWalletID string
-	AccountID        string
-	Amount           float64
-	Currency         string
-	Category         TransactionCategory
-	Note             string
+	ID              string
+	WalletID        string
+	AccountID       string
+	Amount          float64
+	Currency        string
+	TransactionKind TransactionKind
+	Note            string
+	Status          TransactionStatus
 }
 
-func NewTransaction(id string, sender string, receiver string, accountID string, amount float64, currency string, category TransactionCategory, note string) *Transaction {
+func NewTransaction(id string, walletID string, accountID string, amount float64, currency string, transKind TransactionKind, note string, status TransactionStatus) *Transaction {
 	return &Transaction{
-		ID:               id,
-		SenderWalletID:   sender,
-		ReceiverWalletID: receiver,
-		AccountID:        accountID,
-		Amount:           amount,
-		Currency:         currency,
-		Category:         category,
-		Note:             note,
+		ID:              id,
+		WalletID:        walletID,
+		AccountID:       accountID,
+		Amount:          amount,
+		Currency:        currency,
+		TransactionKind: transKind,
+		Note:            note,
+		Status:          status,
 	}
+}
+
+func (t *Transaction) ToSuccessful() error {
+	if t.Status != TransactionStatusNew {
+		return fmt.Errorf("cant update transaction status from %s to %s", t.Status, TransactionStatusSuccessful)
+	}
+	t.Status = TransactionStatusSuccessful
+	return nil
+}
+
+func (t *Transaction) ToFailed() error {
+	if t.Status != TransactionStatusNew {
+		return fmt.Errorf("cant update transaction status from %s to %s", t.Status, TransactionStatusFailed)
+	}
+	t.Status = TransactionStatusFailed
+	return nil
 }

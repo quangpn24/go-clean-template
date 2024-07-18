@@ -1,30 +1,27 @@
 package schema
 
 import (
-	"go-clean-template/entity"
 	"time"
+
+	"go-clean-template/entity"
 )
 
-type AccountSchema struct {
-	ID            string    `gorm:"column:id;primaryKey"`
-	UserID        string    `gorm:"column:user_id;not null"`
-	BankName      string    `gorm:"column:bank_name;not null"`
-	AccountNumber string    `gorm:"column:account_number;not null"`
-	IsLinked      bool      `gorm:"column:is_linked;not null"`
-	CreatedAt     time.Time `gorm:"column:created_at;<-:create"`
-	UpdatedAt     time.Time `gorm:"column:updated_at"`
+type LinkedAccountSchema struct {
+	ID          string    `gorm:"column:id;primaryKey"`
+	UserID      string    `gorm:"column:user_id;not null"`
+	AccountName string    `gorm:"column:account_name;not null"`
+	CreatedAt   time.Time `gorm:"column:created_at;<-:create"`
+	UpdatedAt   time.Time `gorm:"column:updated_at"`
 }
 
-func (*AccountSchema) TableName() string {
-	return "accounts"
+func (*LinkedAccountSchema) TableName() string {
+	return "linked_accounts"
 }
 
-func (a *AccountSchema) ToAccount() *entity.Account {
-	return &entity.Account{
-		ID:            a.ID,
-		UserID:        a.UserID,
-		BankName:      a.BankName,
-		AccountNumber: a.AccountNumber,
-		IsLinked:      a.IsLinked,
+func (a *LinkedAccountSchema) ToLinkedAccount() *entity.LinkedAccount {
+	return &entity.LinkedAccount{
+		ID:          a.ID,
+		UserID:      a.UserID,
+		AccountName: a.AccountName,
 	}
 }

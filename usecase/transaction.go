@@ -6,28 +6,25 @@ import (
 
 	"go-clean-template/entity"
 	"go-clean-template/pkg/apperror"
-	"go-clean-template/usecase/interfaces"
 
 	"github.com/google/uuid"
 )
 
 type TransactionUseCase struct {
-	repo          interfaces.ITransactionRepository
-	paymentSvc    interfaces.IPaymentServiceProvider
-	notifiers     []interfaces.INotifier
-	dbTransaction interfaces.IDBTransaction
+	repo       ITransactionRepository
+	paymentSvc IPaymentServiceProvider
+	notifiers  []INotifier
 }
 
-func NewTransactionUseCase(repo interfaces.ITransactionRepository, paymentSvc interfaces.IPaymentServiceProvider, dbTransaction interfaces.IDBTransaction) *TransactionUseCase {
+func NewTransactionUseCase(repo ITransactionRepository, paymentSvc IPaymentServiceProvider) *TransactionUseCase {
 	return &TransactionUseCase{
-		repo:          repo,
-		paymentSvc:    paymentSvc,
-		notifiers:     []interfaces.INotifier{},
-		dbTransaction: dbTransaction,
+		repo:       repo,
+		paymentSvc: paymentSvc,
+		notifiers:  []INotifier{},
 	}
 }
 
-func (uc *TransactionUseCase) SetNotifiers(notifiers ...interfaces.INotifier) {
+func (uc *TransactionUseCase) SetNotifiers(notifiers ...INotifier) {
 	uc.notifiers = append(uc.notifiers, notifiers...)
 }
 
@@ -38,8 +35,8 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 		trans   *entity.Transaction
 	)
 
-	// check account linking status
-	account, err := uc.repo.GetAccountByID(ctx, accountID)
+	// check account
+	account, err := uc.repo.GetLinkedAccountByID(ctx, accountID)
 	if err != nil {
 		return apperror.ErrGet(err, "failed to get account by id")
 	}
@@ -47,12 +44,8 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 		return apperror.ErrInvalidParams(fmt.Errorf("account not found"))
 	}
 
-	if !account.IsLinked {
-		return apperror.ErrInvalidParams(fmt.Errorf("account not linked"))
-	}
-
 	// create new transaction
-	trans = entity.NewTransaction(transID, "", walletID, accountID, amount, currency, entity.CategoryDeposit, note)
+	trans = entity.NewTransaction(transID, walletID, accountID, amount, currency, entity.TransactionIn, note, entity.TransactionStatusNew)
 
 	// get wallet
 	wallet, err := uc.repo.GetWalletByID(ctx, walletID)
@@ -64,45 +57,9 @@ func (uc *TransactionUseCase) Deposit(ctx context.Context, walletID string, acco
 		return apperror.ErrInvalidParams(fmt.Errorf("wallet not found"))
 	}
 
-	// deposit to wallet
-	if err = wallet.Deposit(amount); err != nil {
-		return apperror.ErrInvalidParams(err)
-	}
-
-	// start transaction
-	tx, err := uc.dbTransaction.Begin(ctx)
-	if err != nil {
-		return apperror.ErrOtherInternalServerError(err, "error when starting transaction")
-	}
-
-	repo := uc.repo.WithDBTransaction(tx)
-
-	// update wallet
-	if err := repo.UpdateWalletBalance(ctx, walletID, wallet.Balance); err != nil {
-		tx.Rollback(ctx)
-		return apperror.ErrUpdate(err, "failed to update balance")
-	}
-
 	// save transaction
-	if err := repo.SaveTransaction(ctx, trans); err != nil {
-		tx.Rollback(ctx)
+	if err := uc.repo.SaveTransaction(ctx, trans); err != nil {
 		return apperror.ErrCreate(err, "failed to create deposit transaction")
-	}
-
-	// call bank service
-	if err := uc.paymentSvc.Deposit(account.AccountNumber, account.BankName, amount, currency, note); err != nil {
-		tx.Rollback(ctx)
-		return apperror.ErrThirdParty(err, "error when calling api deposit payment service")
-	}
-
-	// Commit and finish transaction
-	if err := tx.Commit(ctx); err != nil {
-		return apperror.ErrOtherInternalServerError(err, "error when committing transaction")
-	}
-
-	// notification, don't care result
-	for _, notifier := range uc.notifiers {
-		notifier.SendNotification(ctx, "Deposit success")
 	}
 
 	return nil
@@ -116,20 +73,13 @@ func (uc *TransactionUseCase) Withdraw(ctx context.Context, walletID string, acc
 	)
 
 	// check account linking status
-	account, err := uc.repo.GetAccountByID(ctx, accountID)
+	account, err := uc.repo.GetLinkedAccountByID(ctx, accountID)
 	if err != nil {
 		return apperror.ErrGet(err, "failed to get account by id")
 	}
 	if account == nil {
 		return apperror.ErrInvalidParams(fmt.Errorf("account not found"))
 	}
-
-	if !account.IsLinked {
-		return apperror.ErrInvalidParams(fmt.Errorf("account not linked"))
-	}
-
-	// create new transaction
-	trans = entity.NewTransaction(transID, walletID, "", accountID, amount, currency, entity.CategoryWithdraw, note)
 
 	// get wallet
 	wallet, err := uc.repo.GetWalletByID(ctx, walletID)
@@ -141,46 +91,63 @@ func (uc *TransactionUseCase) Withdraw(ctx context.Context, walletID string, acc
 		return apperror.ErrInvalidParams(fmt.Errorf("wallet not found"))
 	}
 
-	// withdraw to wallet
-	if err = wallet.Withdraw(amount); err != nil {
-		return apperror.ErrInvalidParams(err)
-	}
-
-	// start transaction
-	tx, err := uc.dbTransaction.Begin(ctx)
+	//check balance
+	balance, err := uc.repo.GetBalanceByWalletID(ctx, walletID)
 	if err != nil {
-		return apperror.ErrOtherInternalServerError(err, "error when starting transaction")
+		return apperror.ErrGet(err, "failed to get balance by wallet id")
 	}
 
-	repo := uc.repo.WithDBTransaction(tx)
-
-	// update wallet
-	if err := repo.UpdateWalletBalance(ctx, walletID, wallet.Balance); err != nil {
-		tx.Rollback(ctx)
-		return apperror.ErrUpdate(err, "failed to update balance")
+	if balance < amount {
+		return apperror.ErrInvalidParams(fmt.Errorf("insufficient balance"))
 	}
+	// create new transaction
+	trans = entity.NewTransaction(transID, walletID, accountID, amount, currency, entity.TransactionOut, note, entity.TransactionStatusNew)
 
 	// save transaction
-	if err := repo.SaveTransaction(ctx, trans); err != nil {
-		tx.Rollback(ctx)
+	if err := uc.repo.SaveTransaction(ctx, trans); err != nil {
 		return apperror.ErrCreate(err, "failed to create withdraw transaction")
 	}
 
-	// call bank service
-	if err := uc.paymentSvc.Deposit(account.AccountNumber, account.BankName, amount, currency, note); err != nil {
-		tx.Rollback(ctx)
-		return apperror.ErrThirdParty(err, "error when calling api deposit payment service")
+	return nil
+}
+
+func (uc *TransactionUseCase) PayTransaction(ctx context.Context, transID string) error {
+	var (
+		transStatus entity.TransactionStatus
+		err         error
+	)
+	// get trans
+	trans, err := uc.repo.GetTransactionByID(ctx, transID)
+
+	if err != nil {
+		return apperror.ErrGet(err, "failed to get transaction by id")
 	}
 
-	// Commit and finish transaction
-	if err := tx.Commit(ctx); err != nil {
-		return apperror.ErrOtherInternalServerError(err, "error when committing transaction")
+	if trans == nil {
+		return apperror.ErrInvalidParams(fmt.Errorf("no transactions found in ready-to-pay status"))
 	}
 
-	// notification, don't care result
-	for _, notifier := range uc.notifiers {
-		notifier.SendNotification(ctx, "Deposit success")
+	// check transaction status
+	if trans.Status != entity.TransactionStatusNew {
+		return apperror.ErrInvalidParams(fmt.Errorf("transaction status is not new"))
 	}
 
+	// send to Momo
+	if trans.TransactionKind == entity.TransactionIn {
+		err = uc.paymentSvc.Deposit(ctx, trans.Amount, trans.Currency, trans.Note)
+	} else if trans.TransactionKind == entity.TransactionOut {
+		err = uc.paymentSvc.Withdraw(ctx, trans.Amount, trans.Currency, trans.Note)
+	}
+
+	if err != nil {
+		transStatus = entity.TransactionStatusFailed
+	} else {
+		transStatus = entity.TransactionStatusSuccessful
+	}
+
+	// Update transaction status
+	if err := uc.repo.UpdateTransactionStatus(ctx, transID, transStatus); err != nil {
+		return apperror.ErrUpdate(err, "failed to update transaction status")
+	}
 	return nil
 }

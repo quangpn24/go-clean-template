@@ -12,28 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTransactionRepo_WithDBTransaction(t *testing.T) {
-	//Arrange
-	db := testutil.CreateConnection(t, "test1", "test1", "123456")
-	repo := NewTransactionRepo(db)
-
-	t.Run("success: is DBTransaction", func(t *testing.T) {
-		//Act
-		iRepo := repo.WithDBTransaction(NewDBTransaction(db))
-
-		//Assert
-		assert.NotNil(t, iRepo)
-	})
-
-	t.Run("fail: not DBTransaction", func(t *testing.T) {
-		//Act
-		iRepo := repo.WithDBTransaction(nil)
-
-		//Assert
-		assert.Equal(t, iRepo, repo)
-	})
-}
-
 func TestTransactionRepo_GetWalletByID(t *testing.T) {
 	db := testutil.CreateConnection(t, "test1", "test1", "123456")
 	testutil.MigrateTestDatabase(t, db, "../../migrations")
@@ -45,10 +23,9 @@ func TestTransactionRepo_GetWalletByID(t *testing.T) {
 		walletID := "1"
 		userId := uuid.New().String()
 		want := &entity.Wallet{
-			ID:       walletID,
-			UserID:   userId,
-			Balance:  1000,
-			Currency: "USD",
+			ID:         walletID,
+			UserID:     userId,
+			WalletName: "My Wallet",
 		}
 
 		query := `INSERT INTO users (id,full_name, email, phone_number,current_address)
@@ -77,41 +54,6 @@ func TestTransactionRepo_GetWalletByID(t *testing.T) {
 	})
 }
 
-func TestTransactionRepo_UpdateWalletBalance(t *testing.T) {
-	db := testutil.CreateConnection(t, "test1", "test1", "123456")
-	testutil.MigrateTestDatabase(t, db, "../../migrations")
-	repo := NewTransactionRepo(db)
-	ctx := context.Background()
-
-	t.Run("success: update wallet balance", func(t *testing.T) {
-		//Arrange
-		walletID := "1"
-		userId := uuid.New().String()
-		want := &entity.Wallet{
-			ID:       walletID,
-			UserID:   userId,
-			Balance:  1000,
-			Currency: "USD",
-		}
-
-		query := `INSERT INTO users (id,full_name, email, phone_number,current_address)
-        VALUES (?, 'Phan Ngoc Quang', 'quangpn@tm.teqn.asia', '0123456789', 'HCM')`
-		err := repo.db.Exec(query, userId).Error
-		assert.NoError(t, err)
-
-		err = repo.db.Table(WalletTable).Create(&want).Error
-		assert.NoError(t, err)
-		//Act
-		err = repo.UpdateWalletBalance(ctx, walletID, 2000.0)
-
-		//Assert
-		assert.NoError(t, err)
-		got, _ := repo.GetWalletByID(ctx, walletID)
-		assert.Equal(t, 2000.0, got.Balance)
-
-	})
-}
-
 func TestTransactionRepo_SaveTransaction(t *testing.T) {
 	db := testutil.CreateConnection(t, "test1", "test1", "123456")
 	testutil.MigrateTestDatabase(t, db, "../../migrations")
@@ -129,25 +71,22 @@ func TestTransactionRepo_SaveTransaction(t *testing.T) {
         VALUES (?, 'Phan Ngoc Quang', 'quangpn@tm.teqn.asia', '0123456789', 'HCM')`
 		assert.NoError(t, repo.db.Exec(query, userId).Error)
 
-		account := &schema.AccountSchema{
-			ID:            accountID,
-			UserID:        userId,
-			BankName:      "Vietcombank",
-			AccountNumber: "123456789",
-			IsLinked:      true,
+		account := &schema.LinkedAccountSchema{
+			ID:          accountID,
+			UserID:      userId,
+			AccountName: "momo",
 		}
-		assert.NoError(t, repo.db.Table(AccountTable).Create(account).Error)
+		assert.NoError(t, repo.db.Table(LinkedAccountTable).Create(account).Error)
 
 		wallet := &schema.WalletSchema{
-			ID:       walletID,
-			UserID:   userId,
-			Balance:  1000,
-			Currency: "USD",
+			ID:         walletID,
+			UserID:     userId,
+			WalletName: "My wallet",
 		}
 		assert.NoError(t, repo.db.Table(WalletTable).Create(wallet).Error)
 
-		want := entity.NewTransaction(transID, "", walletID, accountID, 1000,
-			"USD", entity.CategoryDeposit, "")
+		want := entity.NewTransaction(transID, walletID, accountID, 1000,
+			"USD", entity.TransactionIn, "", entity.TransactionStatusNew)
 
 		//Act
 		err := repo.SaveTransaction(ctx, want)
@@ -175,16 +114,14 @@ func TestTransactionRepo_GetAccountByID(t *testing.T) {
         VALUES (?, 'Phan Ngoc Quang', 'quangpn@tm.teqn.asia', '0123456789', 'HCM')`
 		assert.NoError(t, repo.db.Exec(query, userId).Error)
 
-		want := &entity.Account{
-			ID:            accountID,
-			UserID:        userId,
-			BankName:      "Vietcombank",
-			AccountNumber: "123456789",
-			IsLinked:      true,
+		want := &entity.LinkedAccount{
+			ID:          accountID,
+			UserID:      userId,
+			AccountName: "momo",
 		}
-		assert.NoError(t, repo.db.Table(AccountTable).Create(want).Error)
+		assert.NoError(t, repo.db.Table(LinkedAccountTable).Create(want).Error)
 		//Act
-		got, err := repo.GetAccountByID(ctx, accountID)
+		got, err := repo.GetLinkedAccountByID(ctx, accountID)
 
 		//Assert
 		assert.NoError(t, err)
@@ -193,11 +130,100 @@ func TestTransactionRepo_GetAccountByID(t *testing.T) {
 
 	t.Run("record not found", func(t *testing.T) {
 		//Act
-		got, err := repo.GetAccountByID(ctx, "acc_0002")
+		got, err := repo.GetLinkedAccountByID(ctx, "acc_0002")
 
 		//Assert
 		assert.NoError(t, err)
 		assert.Nil(t, got)
+	})
+}
+
+func TestTransactionRepo_GetBalanceByWalletID(t *testing.T) {
+	db := testutil.CreateConnection(t, "test1", "test1", "123456")
+	testutil.MigrateTestDatabase(t, db, "../../migrations")
+	repo := NewTransactionRepo(db)
+	ctx := context.Background()
+
+	t.Run("success: get balance by wallet id", func(t *testing.T) {
+		//Arrange
+		walletID := "1"
+		userId := uuid.New().String()
+
+		query := `INSERT INTO users (id,full_name, email, phone_number,current_address)
+		VALUES (?, 'Phan Ngoc Quang', 'quangpn@tm.teqn.asia', '0123456789', 'HCM')`
+		assert.NoError(t, repo.db.Exec(query, userId).Error)
+
+		wallet := &schema.WalletSchema{
+			ID:         walletID,
+			UserID:     userId,
+			WalletName: "My wallet",
+		}
+
+		assert.NoError(t, repo.db.Table(WalletTable).Create(wallet).Error)
+
+		linkedAccount := &schema.LinkedAccountSchema{
+			ID:          "acc_0001",
+			UserID:      userId,
+			AccountName: "momo",
+		}
+		assert.NoError(t, repo.db.Table(LinkedAccountTable).Create(linkedAccount).Error)
+
+		transIn := entity.NewTransaction(uuid.New().String(), walletID, "acc_0001", 1000, "VND", entity.TransactionIn, "", entity.TransactionStatusSuccessful)
+		transOut := entity.NewTransaction(uuid.New().String(), walletID, "acc_0001", 500, "VND", entity.TransactionOut, "", entity.TransactionStatusSuccessful)
+
+		assert.NoError(t, repo.SaveTransaction(ctx, transIn))
+		assert.NoError(t, repo.SaveTransaction(ctx, transOut))
+
+		//Act
+		got, err := repo.GetBalanceByWalletID(ctx, walletID)
+
+		//Assert
+		assert.NoError(t, err)
+		assert.Equal(t, 500.0, got)
+	})
+}
+
+func TestTransactionRepo_GetTransactionByID(t *testing.T) {
+	db := testutil.CreateConnection(t, "test1", "test1", "123456")
+	testutil.MigrateTestDatabase(t, db, "../../migrations")
+	repo := NewTransactionRepo(db)
+	ctx := context.Background()
+
+	t.Run("success: get transaction by id", func(t *testing.T) {
+		//Arrange
+		transID := "t_001"
+		walletID := "1"
+		userId := uuid.New().String()
+
+		query := `INSERT INTO users (id,full_name, email, phone_number,current_address)
+		VALUES (?, 'Phan Ngoc Quang', 'quangpn@tm.teqn.asia', '0123456789', 'HCM')`
+		assert.NoError(t, repo.db.Exec(query, userId).Error)
+
+		wallet := &schema.WalletSchema{
+			ID:         walletID,
+			UserID:     userId,
+			WalletName: "My wallet",
+		}
+
+		linkedAccount := &schema.LinkedAccountSchema{
+			ID:          "acc_0001",
+			UserID:      userId,
+			AccountName: "momo",
+		}
+		assert.NoError(t, repo.db.Table(LinkedAccountTable).Create(linkedAccount).Error)
+
+		assert.NoError(t, repo.db.Table(WalletTable).Create(wallet).Error)
+
+		transIn := entity.NewTransaction(transID, walletID, "acc_0001", 1000, "VND", entity.TransactionIn, "", entity.TransactionStatusNew)
+
+		assert.NoError(t, repo.SaveTransaction(ctx, transIn))
+
+		//Act
+		got, err := repo.GetTransactionByID(ctx, transID)
+
+		//Assert
+		assert.NoError(t, err)
+		assertTransaction(t, transIn, got)
 	})
 }
 
@@ -206,29 +232,26 @@ func assertWallet(t testing.TB, want *entity.Wallet, got *entity.Wallet) {
 
 	assert.Equal(t, want.ID, got.ID)
 	assert.Equal(t, want.UserID, got.UserID)
-	assert.Equal(t, want.Balance, got.Balance)
-	assert.Equal(t, want.Currency, got.Currency)
+	assert.Equal(t, want.WalletName, got.WalletName)
 }
 
 func assertTransaction(t testing.TB, want *entity.Transaction, got *entity.Transaction) {
 	t.Helper()
 
 	assert.Equal(t, want.ID, got.ID)
-	assert.Equal(t, want.SenderWalletID, got.SenderWalletID)
-	assert.Equal(t, want.ReceiverWalletID, got.ReceiverWalletID)
+	assert.Equal(t, want.WalletID, got.WalletID)
 	assert.Equal(t, want.AccountID, got.AccountID)
 	assert.Equal(t, want.Amount, got.Amount)
 	assert.Equal(t, want.Currency, got.Currency)
-	assert.Equal(t, want.Category, got.Category)
+	assert.Equal(t, want.TransactionKind, got.TransactionKind)
 	assert.Equal(t, want.Note, got.Note)
+	assert.Equal(t, want.Status, got.Status)
 }
 
-func assertAccount(t testing.TB, want *entity.Account, got *entity.Account) {
+func assertAccount(t testing.TB, want *entity.LinkedAccount, got *entity.LinkedAccount) {
 	t.Helper()
 
 	assert.Equal(t, want.ID, got.ID)
 	assert.Equal(t, want.UserID, got.UserID)
-	assert.Equal(t, want.BankName, got.BankName)
-	assert.Equal(t, want.AccountNumber, got.AccountNumber)
-	assert.Equal(t, want.IsLinked, got.IsLinked)
+	assert.Equal(t, want.AccountName, got.AccountName)
 }

@@ -51,8 +51,7 @@ func main() {
 	//Setup Dependencies
 	transRepo := postgrestore.NewTransactionRepo(db)
 	paymentSvc := paymentsvc.NewPaymentServiceProvider()
-	dbTransaction := postgrestore.NewDBTransaction(db)
-	transUseCase := usecase.NewTransactionUseCase(transRepo, paymentSvc, dbTransaction)
+	transUseCase := usecase.NewTransactionUseCase(transRepo, paymentSvc)
 	transUseCase.SetNotifiers(notification.NewEmailNotifier(), notification.NewAppNotifier())
 
 	server.TransactionUseCase = transUseCase

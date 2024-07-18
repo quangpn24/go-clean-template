@@ -1,6 +1,9 @@
 package paymentsvc
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+)
 
 type PaymentServiceProvider struct {
 }
@@ -9,14 +12,14 @@ func NewPaymentServiceProvider() *PaymentServiceProvider {
 	return &PaymentServiceProvider{}
 }
 
-func (b *PaymentServiceProvider) Deposit(accountNumber string, bankName string, amount float64, currency string, note string) error {
+func (b *PaymentServiceProvider) Deposit(ctx context.Context, amount float64, currency string, note string) error {
 	//call psp api to deposit
-	fmt.Println("Deposit successfully")
+	fmt.Printf("Deposit %.2f %s successfully\n", amount, currency)
 	return nil
 }
 
-func (b *PaymentServiceProvider) Withdraw(accountNumber string, bankName string, amount float64, currency string, note string) error {
+func (b *PaymentServiceProvider) Withdraw(ctx context.Context, amount float64, currency string, note string) error {
 	//call psp api to withdraw
-	fmt.Println("Withdraw successfully")
+	fmt.Printf("Withdraw %.2f %s successfully\n", amount, currency)
 	return nil
 }

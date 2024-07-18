@@ -8,7 +8,7 @@ import (
 	"go-clean-template/pkg/config"
 	"go-clean-template/pkg/logger"
 	"go-clean-template/pkg/sentry"
-	"go-clean-template/usecase/interfaces"
+	"go-clean-template/usecase"
 
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
@@ -21,7 +21,7 @@ type Server struct {
 	Config *config.Config
 	Logger *zap.SugaredLogger
 
-	TransactionUseCase interfaces.ITransactionUseCase
+	TransactionUseCase usecase.ITransactionUseCase
 }
 
 func New(options ...Options) (*Server, error) {
