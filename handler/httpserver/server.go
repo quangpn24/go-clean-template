@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	middleware2 "go-clean-template/handler/httpserver/middleware"
 	apperror "go-clean-template/pkg/apperror"
 	"go-clean-template/pkg/config"
 	"go-clean-template/pkg/logger"
@@ -55,6 +56,15 @@ func (s *Server) RegisterGlobalMiddlewares() {
 	s.Router.Use(middleware.RequestID())
 	s.Router.Use(middleware.Gzip())
 	s.Router.Use(sentryecho.New(sentryecho.Options{Repanic: true}))
+
+	skipPath := []string{
+		"/healthz",
+		//"/api/v1/transactions",
+	}
+
+	// Authentication with cognito
+	auth := middleware2.NewAuthentication(s.Config.UserPoolID, skipPath, s.Config)
+	s.Router.Use(auth.Middleware())
 
 	// CORS
 	if s.Config.AllowOrigins != "" {

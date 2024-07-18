@@ -10,10 +10,13 @@ import (
 var Empty = new(Config)
 
 type Config struct {
-	AppEnv       string `envconfig:"APP_ENV"`
-	Port         int    `envconfig:"PORT"`
-	SentryDSN    string `envconfig:"SENTRY_DSN"`
-	AllowOrigins string `envconfig:"ALLOW_ORIGINS"`
+	AppEnv            string `envconfig:"APP_ENV"`
+	Port              int    `envconfig:"PORT"`
+	SentryDSN         string `envconfig:"SENTRY_DSN"`
+	AllowOrigins      string `envconfig:"ALLOW_ORIGINS"`
+	CognitoIssuer     string `envconfig:"COGNITO_ISSUER"`
+	CognitoURLGetJWKS string `envconfig:"COGNITO_URL_GET_JWKS"`
+	UserPoolID        string `envconfig:"USER_POOL_ID"`
 
 	DB struct {
 		Name      string `envconfig:"DB_NAME"`
