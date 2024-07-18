@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"go-clean-template/entity"
 	"go-clean-template/handler/httpserver/model"
 	"go-clean-template/infras/notification"
 	"go-clean-template/infras/paymentsvc"
@@ -42,8 +43,7 @@ func newTransactionServerForTest(t testing.TB, db *gorm.DB) Server {
 
 	transRepo := postgrestore.NewTransactionRepo(db)
 	paymentSvc := paymentsvc.NewPaymentServiceProvider()
-	dbTransaction := postgrestore.NewDBTransaction(db)
-	transUseCase := usecase.NewTransactionUseCase(transRepo, paymentSvc, dbTransaction)
+	transUseCase := usecase.NewTransactionUseCase(transRepo, paymentSvc)
 	transUseCase.SetNotifiers(notification.NewEmailNotifier(), notification.NewAppNotifier())
 
 	router := echo.New()
@@ -64,15 +64,14 @@ func newTransactionServerForTest(t testing.TB, db *gorm.DB) Server {
 	return s
 }
 
-func initDataForDeposit(t testing.TB, db *gorm.DB) (*schema.WalletSchema, *schema.AccountSchema) {
+func initDataForDeposit(t testing.TB, db *gorm.DB) (*schema.WalletSchema, *schema.LinkedAccountSchema) {
 	t.Helper()
 
 	userId := uuid.New().String()
 	w := &schema.WalletSchema{
-		ID:       uuid.New().String(),
-		UserID:   userId,
-		Balance:  100000,
-		Currency: "VND",
+		ID:         uuid.New().String(),
+		UserID:     userId,
+		WalletName: "My Wallet",
 	}
 
 	//create user
@@ -86,14 +85,12 @@ func initDataForDeposit(t testing.TB, db *gorm.DB) (*schema.WalletSchema, *schem
 	assert.NoError(t, err)
 
 	//account
-	a := &schema.AccountSchema{
-		ID:            uuid.New().String(),
-		UserID:        userId,
-		BankName:      "Vietcombank",
-		AccountNumber: "123456789",
-		IsLinked:      true,
+	a := &schema.LinkedAccountSchema{
+		ID:          uuid.New().String(),
+		UserID:      userId,
+		AccountName: "My Account",
 	}
-	assert.NoError(t, db.Table(postgrestore.AccountTable).Create(&a).Error)
+	assert.NoError(t, db.Table(postgrestore.LinkedAccountTable).Create(&a).Error)
 
 	return w, a
 }
@@ -123,8 +120,12 @@ func TestDepositAPI(t *testing.T) {
 
 		// Assert
 		assert.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		var walletAfterDeposit schema.WalletSchema
-		assert.NoError(t, db.Table(postgrestore.WalletTable).Where("id = ?", wallet.ID).Take(&walletAfterDeposit).Error)
-		assert.Equal(t, req.Amount+wallet.Balance, walletAfterDeposit.Balance)
+		var trans *schema.TransactionSchema
+		assert.NoError(t, db.Table(postgrestore.TransactionsTable).
+			Where("wallet_id = ? AND account_id = ?", wallet.ID, account.ID).
+			Take(&trans).Error)
+		assert.NotNil(t, trans)
+		assert.Equal(t, string(entity.TransactionStatusNew), trans.Status)
+		assert.Equal(t, string(entity.TransactionIn), trans.TransactionKind)
 	})
 }

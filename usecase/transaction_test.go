@@ -113,7 +113,7 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 			Status:          entity.TransactionStatusNew,
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(walletMock, nil).Once()
 		transRepo.EXPECT().SaveTransaction(ctx, IsMatchByTransaction(newTransMock)).Return(nil).Once()
 
@@ -135,7 +135,7 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 		note := "Deposit 1,000,000 VND"
 		errDB := fmt.Errorf("unexpected error")
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(nil, errDB).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(nil, errDB).Once()
 
 		//Act
 		err := uc.Deposit(ctx, walletID, accountID, amount, currency, note)
@@ -155,7 +155,7 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 		currency := "VND"
 		note := "Deposit 1,000,000 VND"
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(nil, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(nil, nil).Once()
 
 		//Act
 		err := uc.Deposit(ctx, walletID, accountID, amount, currency, note)
@@ -182,7 +182,7 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 			AccountName: "momo",
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(nil, errDB).Once()
 
 		//Act
@@ -209,7 +209,7 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 			AccountName: "momo",
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(nil, nil).Once()
 
 		//Act
@@ -251,9 +251,10 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 			Currency:        currency,
 			TransactionKind: entity.TransactionIn,
 			Note:            note,
+			Status:          entity.TransactionStatusNew,
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(walletMock, nil).Once()
 		transRepo.EXPECT().SaveTransaction(ctx, IsMatchByTransaction(newTrans)).Return(errSaveTrans).Once()
 
@@ -310,7 +311,7 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 			Status:          entity.TransactionStatusNew,
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(walletMock, nil).Once()
 		transRepo.EXPECT().GetBalanceByWalletID(ctx, walletID).Return(balance, nil).Once()
 		transRepo.EXPECT().SaveTransaction(ctx, IsMatchByTransaction(newTransMock)).Return(nil).Once()
@@ -332,7 +333,7 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 		note := "Withdraw 1,000,000 VND"
 		errDB := fmt.Errorf("unexpected error")
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(nil, errDB).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(nil, errDB).Once()
 
 		//Act
 		err := uc.Withdraw(ctx, walletID, accountID, amount, currency, note)
@@ -352,7 +353,7 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 		currency := "VND"
 		note := "Withdraw 1,000,000 VND"
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(nil, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(nil, nil).Once()
 
 		//Act
 		err := uc.Withdraw(ctx, walletID, accountID, amount, currency, note)
@@ -379,7 +380,7 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 			AccountName: "momo",
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(nil, errDB).Once()
 
 		//Act
@@ -406,7 +407,7 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 			AccountName: "momo",
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(nil, nil).Once()
 
 		//Act
@@ -440,7 +441,7 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 			WalletName: "quangpn's wallet",
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(walletMock, nil).Once()
 		transRepo.EXPECT().GetBalanceByWalletID(ctx, walletID).Return(0, errDB).Once()
 
@@ -475,7 +476,7 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 			WalletName: "quangpn's wallet",
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(walletMock, nil).Once()
 		transRepo.EXPECT().GetBalanceByWalletID(ctx, walletID).Return(balance, nil).Once()
 
@@ -522,7 +523,7 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 			Status:          entity.TransactionStatusNew,
 		}
 
-		transRepo.EXPECT().GetAccountByID(ctx, accountID).Return(accountMock, nil).Once()
+		transRepo.EXPECT().GetLinkedAccountByID(ctx, accountID).Return(accountMock, nil).Once()
 		transRepo.EXPECT().GetWalletByID(ctx, walletID).Return(walletMock, nil).Once()
 		transRepo.EXPECT().GetBalanceByWalletID(ctx, walletID).Return(balance, nil).Once()
 		transRepo.EXPECT().SaveTransaction(ctx, IsMatchByTransaction(newTrans)).Return(errSaveTrans).Once()
@@ -534,6 +535,185 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 		assert.Error(t, err)
 		expectedErr := apperror.ErrCreate(errSaveTrans, "failed to create withdraw transaction")
 		assert.Equal(t, expectedErr, err)
+	})
+}
+
+func TestTransactionUseCase_PayTransaction(t *testing.T) {
+	transRepo := mocks.NewITransactionRepository(t)
+	paymentSvc := mocks.NewIPaymentServiceProvider(t)
+	notifier := mocks.NewINotifier(t)
+	uc := TransactionUseCase{
+		repo:       transRepo,
+		paymentSvc: paymentSvc,
+		notifiers:  []INotifier{notifier},
+	}
+
+	t.Run("success: withdraw", func(t *testing.T) {
+		//Arrange
+		ctx := context.Background()
+		trans := &entity.Transaction{
+			ID:              "t_00001",
+			WalletID:        "w_00001",
+			AccountID:       "a_00001",
+			Amount:          1000000.0,
+			Currency:        "VND",
+			TransactionKind: entity.TransactionOut,
+			Note:            "Withdraw 1,000,000 VND",
+			Status:          entity.TransactionStatusNew,
+		}
+
+		transRepo.EXPECT().GetTransactionByID(ctx, trans.ID).Return(trans, nil).Once()
+
+		paymentSvc.EXPECT().Withdraw(ctx, trans.Amount, trans.Currency, trans.Note).Return(nil).Once()
+
+		transRepo.EXPECT().UpdateTransactionStatus(ctx, trans.ID, entity.TransactionStatusSuccessful).Return(nil).Once()
+
+		//Act
+		err := uc.PayTransaction(ctx, trans.ID)
+
+		//Assert
+		assert.NoError(t, err)
+	})
+
+	t.Run("success: deposit", func(t *testing.T) {
+		//Arrange
+		ctx := context.Background()
+		trans := &entity.Transaction{
+			ID:              "t_00001",
+			WalletID:        "w_00001",
+			AccountID:       "a_00001",
+			Amount:          1000000.0,
+			Currency:        "VND",
+			TransactionKind: entity.TransactionIn,
+			Note:            "Deposit 1,000,000 VND",
+			Status:          entity.TransactionStatusNew,
+		}
+
+		transRepo.EXPECT().GetTransactionByID(ctx, trans.ID).Return(trans, nil).Once()
+
+		paymentSvc.EXPECT().Deposit(ctx, trans.Amount, trans.Currency, trans.Note).Return(nil).Once()
+
+		transRepo.EXPECT().UpdateTransactionStatus(ctx, trans.ID, entity.TransactionStatusSuccessful).Return(nil).Once()
+
+		//Act
+		err := uc.PayTransaction(ctx, trans.ID)
+
+		//Assert
+		assert.NoError(t, err)
+	})
+
+	t.Run("failed to get transaction by id", func(t *testing.T) {
+		//Arrange
+		ctx := context.Background()
+		transID := "t_00001"
+		errDB := fmt.Errorf("unexpected error")
+
+		transRepo.EXPECT().GetTransactionByID(ctx, transID).Return(nil, errDB).Once()
+
+		//Act
+		err := uc.PayTransaction(ctx, transID)
+
+		//Assert
+		assert.Error(t, err)
+		expectedErr := apperror.ErrGet(errDB, "failed to get transaction by id")
+		assert.Equal(t, expectedErr, err)
+	})
+
+	t.Run("no transactions found in ready-to-pay status", func(t *testing.T) {
+		//Arrange
+		ctx := context.Background()
+		transID := "t_00001"
+
+		transRepo.EXPECT().GetTransactionByID(ctx, transID).Return(nil, nil).Once()
+
+		//Act
+		err := uc.PayTransaction(ctx, transID)
+
+		//Assert
+		assert.Error(t, err)
+		expectedErr := apperror.ErrInvalidParams(fmt.Errorf("no transactions found in ready-to-pay status"))
+		assert.Equal(t, expectedErr, err)
+	})
+
+	t.Run("transaction status is not new", func(t *testing.T) {
+		//Arrange
+		ctx := context.Background()
+		transID := "t_00001"
+
+		trans := &entity.Transaction{
+			ID:              transID,
+			WalletID:        "w_00001",
+			AccountID:       "a_00001",
+			Amount:          1000000.0,
+			Currency:        "VND",
+			TransactionKind: entity.TransactionOut,
+			Note:            "Withdraw 1,000,000 VND",
+			Status:          entity.TransactionStatusSuccessful,
+		}
+
+		transRepo.EXPECT().GetTransactionByID(ctx, transID).Return(trans, nil).Once()
+
+		//Act
+		err := uc.PayTransaction(ctx, transID)
+
+		//Assert
+		assert.Error(t, err)
+		expectedErr := apperror.ErrInvalidParams(fmt.Errorf("transaction status is not new"))
+		assert.Equal(t, expectedErr, err)
+	})
+
+	t.Run("failed to withdraw", func(t *testing.T) {
+		//Arrange
+		ctx := context.Background()
+		trans := &entity.Transaction{
+			ID:              "t_00001",
+			WalletID:        "w_00001",
+			AccountID:       "a_00001",
+			Amount:          1000000.0,
+			Currency:        "VND",
+			TransactionKind: entity.TransactionOut,
+			Note:            "Withdraw 1,000,000 VND",
+			Status:          entity.TransactionStatusNew,
+		}
+		errorWithdraw := fmt.Errorf("unexpected error")
+
+		transRepo.EXPECT().GetTransactionByID(ctx, trans.ID).Return(trans, nil).Once()
+		paymentSvc.EXPECT().Withdraw(ctx, trans.Amount, trans.Currency, trans.Note).Return(errorWithdraw).Once()
+
+		transRepo.EXPECT().UpdateTransactionStatus(ctx, trans.ID, entity.TransactionStatusFailed).Return(nil).Once()
+
+		//Act
+		err := uc.PayTransaction(ctx, trans.ID)
+
+		//Assert
+		assert.NoError(t, err)
+	})
+
+	t.Run("failed to deposit", func(t *testing.T) {
+		//Arrange
+		ctx := context.Background()
+		trans := &entity.Transaction{
+			ID:              "t_00001",
+			WalletID:        "w_00001",
+			AccountID:       "a_00001",
+			Amount:          1000000.0,
+			Currency:        "VND",
+			TransactionKind: entity.TransactionIn,
+			Note:            "Deposit 1,000,000 VND",
+			Status:          entity.TransactionStatusNew,
+		}
+		errorWithdraw := fmt.Errorf("unexpected error")
+
+		transRepo.EXPECT().GetTransactionByID(ctx, trans.ID).Return(trans, nil).Once()
+		paymentSvc.EXPECT().Deposit(ctx, trans.Amount, trans.Currency, trans.Note).Return(errorWithdraw).Once()
+
+		transRepo.EXPECT().UpdateTransactionStatus(ctx, trans.ID, entity.TransactionStatusFailed).Return(nil).Once()
+
+		//Act
+		err := uc.PayTransaction(ctx, trans.ID)
+
+		//Assert
+		assert.NoError(t, err)
 	})
 }
 

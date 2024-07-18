@@ -132,7 +132,7 @@ func (uc *TransactionUseCase) PayTransaction(ctx context.Context, transID string
 		return apperror.ErrInvalidParams(fmt.Errorf("transaction status is not new"))
 	}
 
-	// send to Momo
+	// send to payment gateway service
 	if trans.TransactionKind == entity.TransactionIn {
 		err = uc.paymentSvc.Deposit(ctx, trans.Amount, trans.Currency, trans.Note)
 	} else if trans.TransactionKind == entity.TransactionOut {

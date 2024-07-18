@@ -171,8 +171,11 @@ func TestTransactionRepo_GetBalanceByWalletID(t *testing.T) {
 		transIn := entity.NewTransaction(uuid.New().String(), walletID, "acc_0001", 1000, "VND", entity.TransactionIn, "", entity.TransactionStatusSuccessful)
 		transOut := entity.NewTransaction(uuid.New().String(), walletID, "acc_0001", 500, "VND", entity.TransactionOut, "", entity.TransactionStatusSuccessful)
 
-		assert.NoError(t, repo.SaveTransaction(ctx, transIn))
-		assert.NoError(t, repo.SaveTransaction(ctx, transOut))
+		transInSchema := schema.ToTransactionSchema(transIn)
+		transOutSchema := schema.ToTransactionSchema(transOut)
+
+		assert.NoError(t, repo.db.Table(TransactionsTable).Create(transInSchema).Error)
+		assert.NoError(t, repo.db.Table(TransactionsTable).Create(transOutSchema).Error)
 
 		//Act
 		got, err := repo.GetBalanceByWalletID(ctx, walletID)
@@ -215,8 +218,8 @@ func TestTransactionRepo_GetTransactionByID(t *testing.T) {
 		assert.NoError(t, repo.db.Table(WalletTable).Create(wallet).Error)
 
 		transIn := entity.NewTransaction(transID, walletID, "acc_0001", 1000, "VND", entity.TransactionIn, "", entity.TransactionStatusNew)
-
-		assert.NoError(t, repo.SaveTransaction(ctx, transIn))
+		transSchema := schema.ToTransactionSchema(transIn)
+		assert.NoError(t, repo.db.Table(TransactionsTable).Create(transSchema).Error)
 
 		//Act
 		got, err := repo.GetTransactionByID(ctx, transID)
@@ -224,6 +227,61 @@ func TestTransactionRepo_GetTransactionByID(t *testing.T) {
 		//Assert
 		assert.NoError(t, err)
 		assertTransaction(t, transIn, got)
+	})
+}
+
+func TestTransactionRepo_UpdateTransactionStatus(t *testing.T) {
+	db := testutil.CreateConnection(t, "test1", "test1", "123456")
+	testutil.MigrateTestDatabase(t, db, "../../migrations")
+	repo := NewTransactionRepo(db)
+	ctx := context.Background()
+
+	t.Run("success: update transaction status", func(t *testing.T) {
+		//Arrange
+		transID := "t_001"
+		walletID := "1"
+		userId := uuid.New().String()
+
+		query := `INSERT INTO users (id,full_name, email, phone_number,current_address)
+    		VALUES (?, 'Phan Ngoc Quang', 'quangpn@tm.teqn.asia', '0123456789', 'HCM')`
+		assert.NoError(t, repo.db.Exec(query, userId).Error)
+
+		wallet := &schema.WalletSchema{
+			ID:         walletID,
+			UserID:     userId,
+			WalletName: "My wallet",
+		}
+
+		assert.NoError(t, repo.db.Table(WalletTable).Create(wallet).Error)
+
+		linkedAccount := &schema.LinkedAccountSchema{
+			ID:          "acc_0001",
+			UserID:      userId,
+			AccountName: "momo",
+		}
+		assert.NoError(t, repo.db.Table(LinkedAccountTable).Create(linkedAccount).Error)
+
+		transSchema := schema.TransactionSchema{
+			ID:              transID,
+			WalletID:        walletID,
+			AccountID:       "acc_0001",
+			Amount:          1000,
+			Currency:        "VND",
+			TransactionKind: string(entity.TransactionIn),
+			Note:            "",
+			Status:          string(entity.TransactionStatusNew),
+		}
+
+		assert.NoError(t, repo.db.Table(TransactionsTable).Create(&transSchema).Error)
+
+		//Act
+		err := repo.UpdateTransactionStatus(ctx, transID, entity.TransactionStatusSuccessful)
+
+		//Assert
+		assert.NoError(t, err)
+		var got *entity.Transaction
+		assert.NoError(t, repo.db.Raw("SELECT * from transactions").Scan(&got).Error)
+		assert.Equal(t, entity.TransactionStatusSuccessful, got.Status)
 	})
 }
 
