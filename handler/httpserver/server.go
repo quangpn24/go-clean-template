@@ -59,7 +59,7 @@ func (s *Server) RegisterGlobalMiddlewares() {
 
 	skipPath := []string{
 		"/healthz",
-		//"/api/v1/transactions",
+		"/api/v1/transactions",
 	}
 
 	// Authentication with cognito

@@ -5,9 +5,9 @@ import (
 	"log"
 
 	"go-clean-template/handler/httpserver"
+	"go-clean-template/infras/mongo"
 	"go-clean-template/infras/notification"
 	"go-clean-template/infras/paymentsvc"
-	"go-clean-template/infras/postgrestore"
 	"go-clean-template/pkg/config"
 	"go-clean-template/pkg/logger"
 	"go-clean-template/pkg/sentry"
@@ -38,7 +38,12 @@ func main() {
 	}
 	defer sentrygo.Flush(sentry.FlushTime)
 
-	db, err := postgrestore.NewDB(postgrestore.ParseFromConfig(cfg))
+	//db, err := postgrestore.NewDB(postgrestore.ParseFromConfig(cfg))
+	//if err != nil {
+	//	applog.Fatal(err)
+	//}
+
+	db, err := mongo.NewDB(mongo.ParseFromConfig(cfg))
 	if err != nil {
 		applog.Fatal(err)
 	}
@@ -49,7 +54,8 @@ func main() {
 	}
 
 	//Setup Dependencies
-	transRepo := postgrestore.NewTransactionRepo(db)
+	//transRepo := postgrestore.NewTransactionRepo(db)
+	transRepo := mongo.NewTransactionRepo(db)
 	paymentSvc := paymentsvc.NewPaymentServiceProvider()
 	transUseCase := usecase.NewTransactionUseCase(transRepo, paymentSvc)
 	transUseCase.SetNotifiers(notification.NewEmailNotifier(), notification.NewAppNotifier())

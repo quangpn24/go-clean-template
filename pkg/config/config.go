@@ -26,6 +26,14 @@ type Config struct {
 		Pass      string `envconfig:"DB_PASS"`
 		EnableSSL bool   `envconfig:"ENABLE_SSL"`
 	}
+
+	MongoDB struct {
+		Host   string `envconfig:"DB_MONGO_HOST"`
+		Port   int    `envconfig:"DB_MONGO_PORT"`
+		DBName string `envconfig:"DB_MONGO_NAME"`
+		User   string `envconfig:"DB_MONGO_USER"`
+		Pass   string `envconfig:"DB_MONGO_PASS"`
+	}
 }
 
 func LoadConfig() (*Config, error) {
