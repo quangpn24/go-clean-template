@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"go-clean-template/entity"
+	"go-clean-template/internal/entity"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

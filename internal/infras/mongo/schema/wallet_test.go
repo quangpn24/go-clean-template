@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"go-clean-template/entity"
+	"go-clean-template/internal/entity"
 )
 
 func TestWalletSchema_ToWallet(t *testing.T) {

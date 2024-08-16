@@ -38,11 +38,13 @@ func main() {
 	}
 	defer sentrygo.Flush(sentry.FlushTime)
 
+	// Use Postgres
 	//db, err := postgrestore.NewDB(postgrestore.ParseFromConfig(cfg))
 	//if err != nil {
 	//	applog.Fatal(err)
 	//}
 
+	// Use MongoDB
 	db, err := mongo.NewDB(mongo.ParseFromConfig(cfg))
 	if err != nil {
 		applog.Fatal(err)

@@ -3,8 +3,8 @@ package mongo
 import (
 	"context"
 
-	"go-clean-template/entity"
-	"go-clean-template/infras/mongo/schema"
+	"go-clean-template/internal/entity"
+	schema2 "go-clean-template/internal/infras/mongo/schema"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -28,7 +28,7 @@ func NewTransactionRepo(db *mongo.Database) *TransactionRepo {
 func (r *TransactionRepo) GetWalletByID(ctx context.Context, walletID string) (*entity.Wallet, error) {
 	var (
 		wallet       *entity.Wallet
-		walletSchema schema.WalletSchema
+		walletSchema schema2.WalletSchema
 	)
 
 	walletIDObj, err := primitive.ObjectIDFromHex(walletID)
@@ -36,7 +36,7 @@ func (r *TransactionRepo) GetWalletByID(ctx context.Context, walletID string) (*
 		return nil, err
 	}
 
-	if err := r.db.Collection(WalletCollection).FindOne(ctx, schema.WalletSchema{ID: walletIDObj}).Decode(&walletSchema); err != nil {
+	if err := r.db.Collection(WalletCollection).FindOne(ctx, schema2.WalletSchema{ID: walletIDObj}).Decode(&walletSchema); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
 		}
@@ -48,7 +48,7 @@ func (r *TransactionRepo) GetWalletByID(ctx context.Context, walletID string) (*
 }
 
 func (r *TransactionRepo) SaveTransaction(ctx context.Context, trans *entity.Transaction) error {
-	transSchema := schema.ToTransactionSchema(trans)
+	transSchema := schema2.ToTransactionSchema(trans)
 
 	_, err := r.db.Collection(TransactionsCollection).InsertOne(ctx, transSchema)
 
@@ -58,10 +58,10 @@ func (r *TransactionRepo) SaveTransaction(ctx context.Context, trans *entity.Tra
 func (r *TransactionRepo) GetLinkedAccountByID(ctx context.Context, accountID string) (*entity.LinkedAccount, error) {
 	var (
 		account       *entity.LinkedAccount
-		accountSchema schema.LinkedAccountSchema
+		accountSchema schema2.LinkedAccountSchema
 	)
 	objectId, _ := primitive.ObjectIDFromHex(accountID)
-	if err := r.db.Collection(LinkedAccountCollection).FindOne(ctx, schema.LinkedAccountSchema{ID: objectId}).
+	if err := r.db.Collection(LinkedAccountCollection).FindOne(ctx, schema2.LinkedAccountSchema{ID: objectId}).
 		Decode(&accountSchema); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
@@ -118,13 +118,13 @@ func (r *TransactionRepo) GetBalanceByWalletID(ctx context.Context, walletID str
 }
 
 func (r *TransactionRepo) GetTransactionByID(ctx context.Context, transID string) (*entity.Transaction, error) {
-	var transSchema schema.TransactionSchema
+	var transSchema schema2.TransactionSchema
 
 	transIdObj, err := primitive.ObjectIDFromHex(transID)
 	if err != nil {
 		return nil, err
 	}
-	if err := r.db.Collection(TransactionsCollection).FindOne(ctx, schema.TransactionSchema{ID: transIdObj}).
+	if err := r.db.Collection(TransactionsCollection).FindOne(ctx, schema2.TransactionSchema{ID: transIdObj}).
 		Decode(&transSchema); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
