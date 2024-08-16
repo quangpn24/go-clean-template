@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"testing"
 
-	"go-clean-template/entity"
+	"go-clean-template/internal/entity"
+	mocks2 "go-clean-template/internal/usecase/mocks"
 	"go-clean-template/pkg/apperror"
-	"go-clean-template/usecase/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -27,12 +27,12 @@ func TestNewTransactionUseCase(t *testing.T) {
 		{
 			name: "create new transaction use case",
 			args: args{
-				repo:       mocks.NewITransactionRepository(t),
-				paymentSvc: mocks.NewIPaymentServiceProvider(t),
+				repo:       mocks2.NewITransactionRepository(t),
+				paymentSvc: mocks2.NewIPaymentServiceProvider(t),
 			},
 			want: &TransactionUseCase{
-				repo:       mocks.NewITransactionRepository(t),
-				paymentSvc: mocks.NewIPaymentServiceProvider(t),
+				repo:       mocks2.NewITransactionRepository(t),
+				paymentSvc: mocks2.NewIPaymentServiceProvider(t),
 				notifiers:  []INotifier{},
 			},
 		},
@@ -55,12 +55,12 @@ func TestTransactionUseCase_SetNotifiers(t *testing.T) {
 	}{
 		{
 			name:      "set notifiers",
-			notifiers: []INotifier{mocks.NewINotifier(t)},
+			notifiers: []INotifier{mocks2.NewINotifier(t)},
 			object: &TransactionUseCase{
 				notifiers: []INotifier{},
 			},
 			want: &TransactionUseCase{
-				notifiers: []INotifier{mocks.NewINotifier(t)},
+				notifiers: []INotifier{mocks2.NewINotifier(t)},
 			},
 		},
 	}
@@ -72,9 +72,9 @@ func TestTransactionUseCase_SetNotifiers(t *testing.T) {
 }
 
 func TestTransactionUseCase_Deposit(t *testing.T) {
-	transRepo := mocks.NewITransactionRepository(t)
-	paymentSvc := mocks.NewIPaymentServiceProvider(t)
-	notifier := mocks.NewINotifier(t)
+	transRepo := mocks2.NewITransactionRepository(t)
+	paymentSvc := mocks2.NewIPaymentServiceProvider(t)
+	notifier := mocks2.NewINotifier(t)
 	uc := TransactionUseCase{
 		repo:       transRepo,
 		paymentSvc: paymentSvc,
@@ -269,9 +269,9 @@ func TestTransactionUseCase_Deposit(t *testing.T) {
 }
 
 func TestTransactionUseCase_Withdraw(t *testing.T) {
-	transRepo := mocks.NewITransactionRepository(t)
-	paymentSvc := mocks.NewIPaymentServiceProvider(t)
-	notifier := mocks.NewINotifier(t)
+	transRepo := mocks2.NewITransactionRepository(t)
+	paymentSvc := mocks2.NewIPaymentServiceProvider(t)
+	notifier := mocks2.NewINotifier(t)
 	uc := TransactionUseCase{
 		repo:       transRepo,
 		paymentSvc: paymentSvc,
@@ -539,9 +539,9 @@ func TestTransactionUseCase_Withdraw(t *testing.T) {
 }
 
 func TestTransactionUseCase_PayTransaction(t *testing.T) {
-	transRepo := mocks.NewITransactionRepository(t)
-	paymentSvc := mocks.NewIPaymentServiceProvider(t)
-	notifier := mocks.NewINotifier(t)
+	transRepo := mocks2.NewITransactionRepository(t)
+	paymentSvc := mocks2.NewIPaymentServiceProvider(t)
+	notifier := mocks2.NewINotifier(t)
 	uc := TransactionUseCase{
 		repo:       transRepo,
 		paymentSvc: paymentSvc,

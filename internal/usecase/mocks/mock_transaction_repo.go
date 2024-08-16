@@ -4,7 +4,8 @@ package mocks
 
 import (
 	context "context"
-	entity "go-clean-template/entity"
+
+	entity "go-clean-template/internal/entity"
 
 	mock "github.com/stretchr/testify/mock"
 )

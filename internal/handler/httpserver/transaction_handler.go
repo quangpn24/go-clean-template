@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"go-clean-template/handler/httpserver/model"
+	"go-clean-template/internal/handler/httpserver/model"
 	"go-clean-template/pkg/apperror"
 
 	"github.com/labstack/echo/v4"

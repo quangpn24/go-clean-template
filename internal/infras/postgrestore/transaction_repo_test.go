@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"go-clean-template/entity"
-	"go-clean-template/infras/postgrestore/schema"
+	"go-clean-template/internal/entity"
+	"go-clean-template/internal/infras/postgrestore/schema"
 	"go-clean-template/pkg/testutil"
 
 	"github.com/google/uuid"

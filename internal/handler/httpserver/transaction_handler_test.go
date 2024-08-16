@@ -8,9 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"go-clean-template/handler/httpserver/model"
+	"go-clean-template/internal/handler/httpserver/model"
+	"go-clean-template/internal/usecase/mocks"
 	"go-clean-template/pkg/testutil"
-	"go-clean-template/usecase/mocks"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"

@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"log"
 
-	"go-clean-template/handler/httpserver"
-	"go-clean-template/infras/notification"
-	"go-clean-template/infras/paymentsvc"
-	"go-clean-template/infras/postgrestore"
+	"go-clean-template/internal/handler/httpserver"
+	"go-clean-template/internal/infras/notification"
+	"go-clean-template/internal/infras/paymentsvc"
+	"go-clean-template/internal/infras/postgrestore"
+	"go-clean-template/internal/usecase"
 	"go-clean-template/pkg/config"
 	"go-clean-template/pkg/logger"
 	"go-clean-template/pkg/sentry"
-	"go-clean-template/usecase"
 
 	sentrygo "github.com/getsentry/sentry-go"
 )

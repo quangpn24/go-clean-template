@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"strings"
 
-	middleware2 "go-clean-template/handler/httpserver/middleware"
-	apperror "go-clean-template/pkg/apperror"
+	middleware2 "go-clean-template/internal/handler/httpserver/middleware"
+	"go-clean-template/internal/usecase"
+	"go-clean-template/pkg/apperror"
 	"go-clean-template/pkg/config"
 	"go-clean-template/pkg/logger"
 	"go-clean-template/pkg/sentry"
-	"go-clean-template/usecase"
 
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"

@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"go-clean-template/entity"
+	"go-clean-template/internal/entity"
 )
 
 type ITransactionUseCase interface {

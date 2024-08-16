@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"go-clean-template/entity"
+	"go-clean-template/internal/entity"
 	"go-clean-template/pkg/apperror"
 
 	"github.com/google/uuid"

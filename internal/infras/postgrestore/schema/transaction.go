@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"go-clean-template/entity"
+	"go-clean-template/internal/entity"
 )
 
 type TransactionSchema struct {

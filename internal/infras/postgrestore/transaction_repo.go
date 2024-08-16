@@ -3,8 +3,8 @@ package postgrestore
 import (
 	"context"
 
-	"go-clean-template/entity"
-	"go-clean-template/infras/postgrestore/schema"
+	"go-clean-template/internal/entity"
+	"go-clean-template/internal/infras/postgrestore/schema"
 
 	"gorm.io/gorm"
 )

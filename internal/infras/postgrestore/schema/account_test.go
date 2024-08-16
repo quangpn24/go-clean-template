@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"go-clean-template/entity"
+	"go-clean-template/internal/entity"
 )
 
 func TestAccountSchema_ToLinkedAccount(t *testing.T) {
